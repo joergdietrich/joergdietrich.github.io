@@ -4,7 +4,7 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>Blogging with IPython and Collapsible Input Cells</title>
+  <title>Blogging with IPython and Collapsible Input Cells</title>
   <meta name="author" content="Jörg Dietrich">
 
 
@@ -1780,30 +1780,30 @@ jQuery(document).ready(function($) {
 <div>
   <article class="hentry" role="article">
 <header>
-      <h1 class="entry-title">Blogging with IPython and Collapsible Input Cells</h1>
+      <h1 class="entry-title">Blogging with IPython and Collapsible Input Cells</h1>
       <p class="meta"><time datetime="2014-02-08T00:00:00" pubdate>Sat 08 February 2014</time></p>
 </header>
 
   <div class="entry-content"><p>
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>I learned about IPython Notebooks from the fantastic blog of <a href="http://jakevdp.github.io/">jakevdp</a>. Realizing what a great way they are to interactivly manipulate Python code and transform the results into web pages, I started playing around with them and the pelican site generator myself. I had a few science questions on my mind for which I thought writing things up with some nice graphical illustrations would clarify things for myself and maybe others. Then I arrived at a point where I had long input boxes in my web pages with Python code that was not very interesting. I just wanted to have some figures for illustration. Of course I could just generate some plots, save them and load them into the Notebook to display them. But that seemed like an unnecessary detour if I already created the plots in the notebook. Could I not just hide the input cells? It turns out the answer was apparently &quot;no&quot;.</p>
+<p>I learned about IPython Notebooks from the fantastic blog of <a href="http://jakevdp.github.io/">jakevdp</a>. Realizing what a great way they are to interactivly manipulate Python code and transform the results into web pages, I started playing around with them and the pelican site generator myself. I had a few science questions on my mind for which I thought writing things up with some nice graphical illustrations would clarify things for myself and maybe others. Then I arrived at a point where I had long input boxes in my web pages with Python code that was not very interesting. I just wanted to have some figures for illustration. Of course I could just generate some plots, save them and load them into the Notebook to display them. But that seemed like an unnecessary detour if I already created the plots in the notebook. Could I not just hide the input cells? It turns out the answer was apparently&nbsp;&quot;no&quot;.</p>
 <p>So I interrupted the process of writing about the original problems that were on my mind and set out to modify the liquid_tags pelican plugin that generates these pages so that the input code cells can be hidden. </p>
 </div>
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>Hiding input cells in the IPython Notebook is a feature that is often requested but not implemented yet. Looking at the discussions of the various github issues that discuss this, it is not clear to me that it will ever be available. There are a lot of complications trying to do this right in an interactive notebook. However, the problem should be manageable in static web pages. So I set out to dig into the internals of the liquid_tags pelican plugin. The result is currently in my fork of the pelican-plugins repository: https://github.com/joergdietrich/pelican-plugins/tree/collapse-code</p>
-<p>I assume you have a basic familiarity with how to blog with pelican and IPython Notebooks. If not, have a look at these ressources first:</p>
+<p>Hiding input cells in the IPython Notebook is a feature that is often requested but not implemented yet. Looking at the discussions of the various github issues that discuss this, it is not clear to me that it will ever be available. There are a lot of complications trying to do this right in an interactive notebook. However, the problem should be manageable in static web pages. So I set out to dig into the internals of the liquid_tags pelican plugin. The result is currently in my fork of the pelican-plugins repository:&nbsp;https://github.com/joergdietrich/pelican-plugins/tree/collapse-code</p>
+<p>I assume you have a basic familiarity with how to blog with pelican and IPython Notebooks. If not, have a look at these ressources&nbsp;first:</p>
 <ul>
-<li><a href="http://jakevdp.github.io/blog/2013/05/07/migrating-from-octopress-to-pelican/">Jake's blog post on migrating to pelican</a></li>
-<li><a href="http://themodernscientist.com/posts/2013/2013-06-02-my_octopelican_python_blog/">themodernscientist's blog post on blogging with notebooks and pelican</a></li>
-<li><a href="https://github.com/getpelican/pelican-plugins/blob/master/liquid_tags/Readme.md">The liquid_tags README</a></li>
+<li><a href="http://jakevdp.github.io/blog/2013/05/07/migrating-from-octopress-to-pelican/">Jake&#8217;s blog post on migrating to&nbsp;pelican</a></li>
+<li><a href="http://themodernscientist.com/posts/2013/2013-06-02-my_octopelican_python_blog/">themodernscientist&#8217;s blog post on blogging with notebooks and&nbsp;pelican</a></li>
+<li><a href="https://github.com/getpelican/pelican-plugins/blob/master/liquid_tags/Readme.md">The liquid_tags&nbsp;<span class="caps">README</span></a></li>
 </ul>
-<p>My branch comes with a new template file <code>pelicanhtml.tpl</code> in <code>liquid_tags</code>. To enable code collapsing, you need to copy this to the top level of your blog directory. Collapsible code boxes are then created by adding a comment line to the Python code. These come in two flavors:</p>
+<p>My branch comes with a new template file <code>pelicanhtml.tpl</code> in <code>liquid_tags</code>. To enable code collapsing, you need to copy this to the top level of your blog directory. Collapsible code boxes are then created by adding a comment line to the Python code. These come in two&nbsp;flavors:</p>
 <ol style="list-style-type: decimal">
 <li>Boxes that are collapsed on load and can be expanded are created with the comment <code># &lt;!-- collapse=True --&gt;</code></li>
 <li>Boxes that are expanded on load and can be collapsed are created with the comment <code># &lt;!-- collapse=False --&gt;</code></li>
 </ol>
-<p>If no collapse comment is given, the standard input box is created. Note that the pattern above has to match exactly, including the number of whitespaces, since the official release of the <a href="http://jinja.pocoo.org/docs/">jinja2</a> templating engine does not yet support regular expressions. The collapse comment line is removed during page creation so that it is not visible in the examples below.</p>
-<p>Here is an example of a rather long input code box using one of the <code>matplotlib</code> example programs. This one is collapsed on load:</p>
+<p>If no collapse comment is given, the standard input box is created. Note that the pattern above has to match exactly, including the number of whitespaces, since the official release of the <a href="http://jinja.pocoo.org/docs/">jinja2</a> templating engine does not yet support regular expressions. The collapse comment line is removed during page creation so that it is not visible in the examples&nbsp;below.</p>
+<p>Here is an example of a rather long input code box using one of the <code>matplotlib</code> example programs. This one is collapsed on&nbsp;load:</p>
 </div>
 <div class="cell border-box-sizing code_cell vbox">
 <div class="input hbox">
@@ -3502,7 +3502,7 @@ z
 
 </div>
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>Here is a shorter code snippet, which is shown on load but can be collapsed:</p>
+<p>Here is a shorter code snippet, which is shown on load but can be&nbsp;collapsed:</p>
 </div>
 <div class="cell border-box-sizing code_cell vbox">
 <div class="input hbox">
@@ -7074,7 +7074,7 @@ L21.6453 11.7727" style="fill:none;stroke:#000000;"/>
 </div>
 
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>The expand/collapse function is implemented via <a href="http://www.jquery.com/">jQuery's</a> <code>.slideToggle()</code>. To work, this obviously requires that your readers have javascript enabled. This also means that if they don't, they cannot unhide code, which is collapsed on load. JQuery is loaded via https from Google's CDN. If you prefer not to use Google for whatever reason, change line 145 in <a href="https://github.com/joergdietrich/pelican-plugins/blob/collapse-code/liquid_tags/notebook.py"><code>liquid_tags/notebook.py</code></a>. The style of the Collapse/Expand header is defined starting at line 116 in the same file. An exception is the font style of this header, which is defined in the <code>&lt;span&gt;</code> tags in lines 27 and 33 of <a href="https://github.com/joergdietrich/pelican-plugins/blob/collapse-code/liquid_tags/pelicanhtml.tpl"><code>liquid_tags/pelicanhtml.tpl</code></a>. The reason is that the code box would otherwise inherit the font properties. It might be cleaner to define the fonts for the header in the CSS and then fix them again the in the CSS for the <code>input_area</code>. But this is supposed to be a quick hack and it works.</p>
+<p>The expand/collapse function is implemented via <a href="http://www.jquery.com/">jQuery&#8217;s</a> <code>.slideToggle()</code>. To work, this obviously requires that your readers have javascript enabled. This also means that if they don&#8217;t, they cannot unhide code, which is collapsed on load. JQuery is loaded via https from Google&#8217;s <span class="caps">CDN</span>. If you prefer not to use Google for whatever reason, change line 145 in <a href="https://github.com/joergdietrich/pelican-plugins/blob/collapse-code/liquid_tags/notebook.py"><code>liquid_tags/notebook.py</code></a>. The style of the Collapse/Expand header is defined starting at line 116 in the same file. An exception is the font style of this header, which is defined in the <code>&lt;span&gt;</code> tags in lines 27 and 33 of <a href="https://github.com/joergdietrich/pelican-plugins/blob/collapse-code/liquid_tags/pelicanhtml.tpl"><code>liquid_tags/pelicanhtml.tpl</code></a>. The reason is that the code box would otherwise inherit the font properties. It might be cleaner to define the fonts for the header in the <span class="caps">CSS</span> and then fix them again the in the <span class="caps">CSS</span> for the <code>input_area</code>. But this is supposed to be a quick hack and it&nbsp;works.</p>
 </div></p></div>
     <footer>
 <p class="meta">
@@ -7101,7 +7101,7 @@ L21.6453 11.7727" style="fill:none;stroke:#000000;"/>
     <h1>Recent Posts</h1>
     <ul id="recent_posts">
       <li class="post">
-          <a href="http://joergdietrich.github.io/notebook-collapse-input.html">Blogging with IPython and Collapsible Input Cells</a>
+          <a href="http://joergdietrich.github.io/notebook-collapse-input.html">Blogging with IPython and Collapsible Input Cells</a>
       </li>
     </ul>
   </section>
@@ -7119,6 +7119,14 @@ L21.6453 11.7727" style="fill:none;stroke:#000000;"/>
     <a href="http://joergdietrich.github.io/tag/python.html">python</a>,    <a href="http://joergdietrich.github.io/tag/pelican.html">pelican</a>,    <a href="http://joergdietrich.github.io/tag/notebook.html">notebook</a>,    <a href="http://joergdietrich.github.io/tag/blogging.html">blogging</a>  </section>
 
 
+    <section>
+        <h1>Social</h1>
+        <ul>
+            <li><a href="/" type="application/rss+xml" rel="alternate">RSS</a></li>
+            <li><a href="http://github.com/joergdietrich/" target="_blank">GitHub</a></li>
+            <li><a href="https://twitter.com/joergdietrich" target="_blank">Twitter</a></li>
+        </ul>
+    </section>
 
 <section>
     <p>Follow <a href="http://twitter.com/joergdietrich">@joergdietrich</a></p>
@@ -7151,7 +7159,7 @@ L21.6453 11.7727" style="fill:none;stroke:#000000;"/>
 	  var disqus_shortname = 'randomuniverse';
           var disqus_identifier = '/notebook-collapse-input.html';
           var disqus_url = 'http://joergdietrich.github.io/notebook-collapse-input.html';
-          var disqus_title = 'Blogging with IPython and Collapsible Input Cells';
+          var disqus_title = 'Blogging with IPython and Collapsible Input&nbsp;Cells';
 	  (function() {
 	    var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
 	    dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
