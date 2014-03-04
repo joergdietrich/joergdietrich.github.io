@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom"><title>Random Thoughts in a Random Universe</title><link href="http://joergdietrich.github.io/" rel="alternate"></link><link href="/feeds/all.atom.xml" rel="self"></link><id>http://joergdietrich.github.io/</id><updated>2014-03-04T00:00:00+01:00</updated><entry><title>How Much Do My Measurements Disagree?</title><link href="http://joergdietrich.github.io/quantitative-data-disagreement.html" rel="alternate"></link><updated>2014-03-04T00:00:00+01:00</updated><author><name>Jörg Dietrich</name></author><id>tag:joergdietrich.github.io,2014-03-04:quantitative-data-disagreement.html</id><summary type="html">&lt;p&gt;
 &lt;div class="text_cell_render border-box-sizing rendered_html"&gt;
-&lt;h2 id="Or-why-&amp;quot;The-error-bars-overlap&amp;quot;-is-a-meaningless-statement."&gt;Or why &amp;#8220;The error bars overlap&amp;#8221; is a meaningless statement.&lt;a class="anchor-link" href="#Or-why-&amp;quot;The-error-bars-overlap&amp;quot;-is-a-meaningless-statement."&gt;&amp;#182;&lt;/a&gt;&lt;/h2&gt;
+&lt;h2 id="-Or-why-&amp;quot;The-error-bars-overlap&amp;quot;-is-a-meaningless-statement."&gt; Or why &amp;#8220;The error bars overlap&amp;#8221; is a meaningless statement.&lt;a class="anchor-link" href="#-Or-why-&amp;quot;The-error-bars-overlap&amp;quot;-is-a-meaningless-statement."&gt;&amp;#182;&lt;/a&gt;&lt;/h2&gt;
 &lt;/div&gt;
 
 &lt;div class="text_cell_render border-box-sizing rendered_html"&gt;
-
 &lt;p&gt;In my work as an astrophysicist I have encountered quite a bit of confusion on how to quantify the level of disagreement between two or more measurements with error bars, or even more complex multi-dimensional confidence volumes. This is even more true this term when I am teaching an undergraduate lab course. Thinking a little about this myself, I realized that this is not something I have ever seen written up. At least not in any concise form. So I decided to create this little document, not only to educate others, but also to organize my own thoughts. I put an emphasis on developing the concepts and I make no attempt at&amp;nbsp;rigour.&lt;/p&gt;
 &lt;p&gt;Suppose we have three measurements of the gravitational acceleration on the Earth&amp;#8217;s surface, all with their own error bars (or measurement uncertainties, if you prefer). These are shown in the plot below and the error bars indicate their &lt;span class="math"&gt;\(1\sigma\)&lt;/span&gt; standard deviation. &lt;/p&gt;
 &lt;/div&gt;
