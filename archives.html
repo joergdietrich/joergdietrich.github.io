@@ -1761,6 +1761,21 @@ jQuery(document).ready(function($) {
     	</header>
 
     	<div id="blog-archives">
+            <h2>2015</h2>
+                    <article>
+                        <h1><a href="are-theorists-smarter.html">Are Theorists Smarter Than&nbsp;Observers?</a></h1>
+                        <time datetime="2015-02-17 00:00:00" pubdate>
+                            <span class="month">Feb</span>
+                            <span class="day">17</span>
+                            <span class="year">2015</span>
+                        </time>
+                        <footer>
+                            <span class="categories">posted in
+                                <a class='category' href='/category/blog.html'>Blog</a>
+                                
+                            </span>
+                        </footer>
+                    </article>
             <h2>2014</h2>
                     <article>
                         <h1><a href="python-physics-equations.html">Making Your Python Code Look Like Physics&nbsp;Equations</a></h1>
@@ -1812,6 +1827,9 @@ jQuery(document).ready(function($) {
     <h1>Recent Posts</h1>
     <ul id="recent_posts">
       <li class="post">
+          <a href="http://joergdietrich.github.io/are-theorists-smarter.html">Are Theorists Smarter Than Observers?</a>
+      </li>
+      <li class="post">
           <a href="http://joergdietrich.github.io/python-physics-equations.html">Making Your Python Code Look Like Physics Equations</a>
       </li>
       <li class="post">
@@ -1833,8 +1851,37 @@ jQuery(document).ready(function($) {
 
   <section>
   <h1>Tags</h1>
-    <a href="http://joergdietrich.github.io/tag/pelican.html">pelican</a>,    <a href="http://joergdietrich.github.io/tag/statistics.html">statistics</a>,    <a href="http://joergdietrich.github.io/tag/python.html">python</a>,    <a href="http://joergdietrich.github.io/tag/notebook.html">notebook</a>,    <a href="http://joergdietrich.github.io/tag/data-analysis.html">data analysis</a>,    <a href="http://joergdietrich.github.io/tag/blogging.html">blogging</a>  </section>
+    <a href="http://joergdietrich.github.io/tag/sociology-of-science.html">sociology of science</a>,    <a href="http://joergdietrich.github.io/tag/statistics.html">statistics</a>,    <a href="http://joergdietrich.github.io/tag/pelican.html">pelican</a>,    <a href="http://joergdietrich.github.io/tag/python.html">python</a>,    <a href="http://joergdietrich.github.io/tag/notebook.html">notebook</a>,    <a href="http://joergdietrich.github.io/tag/data-analysis.html">data analysis</a>,    <a href="http://joergdietrich.github.io/tag/blogging.html">blogging</a>  </section>
 
+
+
+  <section>
+    <h1>GitHub Repos</h1>
+    <ul id="gh_repos">
+      <li class="loading">Status updating...</li>
+    </ul>
+      <a href="https://github.com/joergdietrich">@joergdietrich</a> on GitHub
+    <script type="text/javascript">
+
+    $.domReady(function(){
+          if (!window.jXHR){
+              var jxhr = document.createElement('script');
+              jxhr.type = 'text/javascript';
+              jxhr.src = 'http://joergdietrich.github.io/theme/js/jXHR.js';
+              var s = document.getElementsByTagName('script')[0];
+              s.parentNode.insertBefore(jxhr, s);
+          }
+
+          github.showRepos({
+              user: 'joergdietrich',
+              count: 3,
+              skip_forks: true,
+              target: '#gh_repos'
+          });
+      });
+    </script>
+    <script src="http://joergdietrich.github.io/theme/js/github.js" type="text/javascript"> </script>
+  </section>
 
 
 <section>
@@ -1843,7 +1890,7 @@ jQuery(document).ready(function($) {
 </aside>    </div>
   </div>
   <footer role="contentinfo"><p>
-  Copyright &copy; 2014 - Jörg Dietrich -
+  Copyright &copy; 2014&ndash;2015 - Jörg Dietrich -
   <span class="credit">Powered by <a href="http://getpelican.com">Pelican</a></span>
 </p></footer>
     <script type="text/javascript">

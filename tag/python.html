@@ -1824,8 +1824,37 @@ jQuery(document).ready(function($) {
 
   <section>
   <h1>Tags</h1>
-    <a href="http://joergdietrich.github.io/tag/pelican.html">pelican</a>,    <a href="http://joergdietrich.github.io/tag/statistics.html">statistics</a>,    <a href="http://joergdietrich.github.io/tag/python.html">python</a>,    <a href="http://joergdietrich.github.io/tag/notebook.html">notebook</a>,    <a href="http://joergdietrich.github.io/tag/data-analysis.html">data analysis</a>,    <a href="http://joergdietrich.github.io/tag/blogging.html">blogging</a>  </section>
+    <a href="http://joergdietrich.github.io/tag/sociology-of-science.html">sociology of science</a>,    <a href="http://joergdietrich.github.io/tag/statistics.html">statistics</a>,    <a href="http://joergdietrich.github.io/tag/pelican.html">pelican</a>,    <a href="http://joergdietrich.github.io/tag/python.html">python</a>,    <a href="http://joergdietrich.github.io/tag/notebook.html">notebook</a>,    <a href="http://joergdietrich.github.io/tag/data-analysis.html">data analysis</a>,    <a href="http://joergdietrich.github.io/tag/blogging.html">blogging</a>  </section>
 
+
+
+  <section>
+    <h1>GitHub Repos</h1>
+    <ul id="gh_repos">
+      <li class="loading">Status updating...</li>
+    </ul>
+      <a href="https://github.com/joergdietrich">@joergdietrich</a> on GitHub
+    <script type="text/javascript">
+
+    $.domReady(function(){
+          if (!window.jXHR){
+              var jxhr = document.createElement('script');
+              jxhr.type = 'text/javascript';
+              jxhr.src = 'http://joergdietrich.github.io/theme/js/jXHR.js';
+              var s = document.getElementsByTagName('script')[0];
+              s.parentNode.insertBefore(jxhr, s);
+          }
+
+          github.showRepos({
+              user: 'joergdietrich',
+              count: 3,
+              skip_forks: true,
+              target: '#gh_repos'
+          });
+      });
+    </script>
+    <script src="http://joergdietrich.github.io/theme/js/github.js" type="text/javascript"> </script>
+  </section>
 
 
 <section>
@@ -1834,7 +1863,7 @@ jQuery(document).ready(function($) {
 </aside>    </div>
   </div>
   <footer role="contentinfo"><p>
-  Copyright &copy; 2014 - Jörg Dietrich -
+  Copyright &copy; 2014&ndash;2015 - Jörg Dietrich -
   <span class="credit">Powered by <a href="http://getpelican.com">Pelican</a></span>
 </p></footer>
     <script type="text/javascript">
