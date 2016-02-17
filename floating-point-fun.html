@@ -4,7 +4,7 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>Random Thoughts in a Random Universe - blogging</title>
+  <title>Fun with Floating Point Precision in numpy</title>
   <meta name="author" content="Jörg Dietrich">
 
   <link href="/feeds/atom.xml" type="application/atom+xml" rel="alternate"
@@ -245,20 +245,18 @@ jQuery(document).ready(function($) {
 -->
 
 <ul class="main-navigation">
-    <li >
+    <li class="active">
     <a href="http://joergdietrich.github.io/category/blog.html">Blog</a>
     </li>
     <li><a href="http://www.usm.lmu.de/people/dietrich/">Home Page</a></li>
 </ul></nav>
   <div id="main">
     <div id="content">
-<div class="blog-index">
-  		<article>
+<div>
+  <article class="hentry" role="article">
 <header>
-      <h1 class="entry-title">
-        <a href="http://joergdietrich.github.io/notebook-collapse-input.html">Blogging with IPython and Collapsible Input Cells</a>
-      </h1>
-      <p class="meta"><time datetime="2014-02-08T00:00:00+01:00" pubdate>Sat 08 February 2014</time></p>
+      <h1 class="entry-title">Fun with Floating Point Precision in numpy</h1>
+      <p class="meta"><time datetime="2016-02-17T00:00:00+01:00" pubdate>Wed 17 February 2016</time></p>
 </header>
 
   <div class="entry-content"><p>
@@ -267,21 +265,397 @@ jQuery(document).ready(function($) {
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>I learned about IPython Notebooks from the fantastic blog of <a href="http://jakevdp.github.io/">jakevdp</a>. Realizing what a great way they are to interactivly manipulate Python code and transform the results into web pages, I started playing around with them and the pelican site generator myself. I had a few science questions on my mind for which I thought writing things up with some nice graphical illustrations would clarify things for myself and maybe others. Then I arrived at a point where I had long input boxes in my web pages with Python code that was not very interesting. I just wanted to have some figures for illustration. Of course I could just generate some plots, save them and load them into the Notebook to display them. But that seemed like an unnecessary detour if I already created the plots in the notebook. Could I not just hide the input cells? It turns out the answer was apparently&nbsp;&#8220;no&#8221;.</p>
-<p>So I interrupted the process of writing about the original problems that were on my mind and set out to modify the liquid_tags pelican plugin that generates these pages so that the input code cells can be hidden.
-</div>
-  <footer>
-    <a rel="full-article" href="http://joergdietrich.github.io/notebook-collapse-input.html">Read On &crarr;</a>
-  </footer>
-  		</article>
-<div class="pagination">
+<p>I recently had a bug in my code that obviously was caused by an issue with floating point precision but had me scratching my head how it came about. Here it&nbsp;is:</p>
 
-  <br />
-</div></div>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[1]:</div>
+
+<div class="inner_cell">
+    <div class="input_area">
+        <div class=" highlight hl-ipython3"><pre><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">astropy.table</span> <span class="k">import</span> <span class="n">Table</span>
+<span class="kn">from</span> <span class="nn">astropy</span> <span class="k">import</span> <span class="n">cosmology</span>
+
+<span class="n">cosmo</span> <span class="o">=</span> <span class="n">cosmology</span><span class="o">.</span><span class="n">WMAP9</span>
+</pre></div>
+
+    </div>
+</div>
+
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p><code>Table</code> lets me read a <span class="caps">FITS</span> table, the standard data format in Astronomy. I draw a random sample from a table column into a <code>numpy.ndarray</code>.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[2]:</div>
+
+<div class="inner_cell">
+    <div class="input_area">
+        <div class=" highlight hl-ipython3"><pre><span class="n">tab</span> <span class="o">=</span> <span class="n">Table</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="s">&quot;https://github.com/joergdietrich/joergdietrich.github.io/raw/master/data/float.fits&quot;</span><span class="p">)</span>
+<span class="n">z</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">tab</span><span class="p">[</span><span class="s">&#39;x&#39;</span><span class="p">],</span> <span class="mi">500</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area"><div class="prompt"></div>
+<div class="output_subarea output_stream output_stdout output_text">
+<pre class="ipynb">Downloading https://github.com/joergdietrich/joergdietrich.github.io/raw/master/data/float.fits [Done]
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>I needed to call some <code>astropy</code> code (<code>angular_diameter_distance_z1z2(z1, z2)</code>), which takes two arrays are argument and requires that all values in <code>z1</code> are less or equal than the values in <code>z2</code>. In my case <code>z1</code> is a constant and I enforce this constraint by setting by setting all smaller values equal to this&nbsp;constant.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[3]:</div>
+
+<div class="inner_cell">
+    <div class="input_area">
+        <div class=" highlight hl-ipython3"><pre><span class="n">zl</span> <span class="o">=</span> <span class="mf">0.32</span>
+<span class="n">idx</span> <span class="o">=</span> <span class="n">z</span> <span class="o">&lt;</span> <span class="n">zl</span>
+<span class="n">z</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">zl</span>
+<span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">z</span> <span class="o">&lt;</span> <span class="n">zl</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area"><div class="prompt output_prompt">Out[3]:</div>
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre class="ipynb">False</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>So far, so good. The code actually refused to compare a scalar with an array, so I called it like&nbsp;this:</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[4]:</div>
+
+<div class="inner_cell">
+    <div class="input_area">
+        <div class=" highlight hl-ipython3"><pre><span class="n">dls</span> <span class="o">=</span> <span class="n">cosmo</span><span class="o">.</span><span class="n">angular_diameter_distance_z1z2</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="n">zl</span><span class="p">,</span> <span class="n">z</span><span class="o">.</span><span class="n">size</span><span class="p">),</span> <span class="n">z</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area"><div class="prompt"></div>
+<div class="output_subarea output_text output_error">
+<pre class="ipynb"><div class="output_subarea output_text output_error">
+<pre>
+<span class="ansired">---------------------------------------------------------------------------</span>
+<span class="ansired">ValueError</span>                                Traceback (most recent call last)
+<span class="ansigreen">&lt;ipython-input-4-f71b9851644c&gt;</span> in <span class="ansicyan">&lt;module&gt;</span><span class="ansiblue">()</span>
+<span class="ansigreen">----&gt; 1</span><span class="ansiyellow"> </span>dls <span class="ansiyellow">=</span> cosmo<span class="ansiyellow">.</span>angular_diameter_distance_z1z2<span class="ansiyellow">(</span>np<span class="ansiyellow">.</span>repeat<span class="ansiyellow">(</span>zl<span class="ansiyellow">,</span> z<span class="ansiyellow">.</span>size<span class="ansiyellow">)</span><span class="ansiyellow">,</span> z<span class="ansiyellow">)</span><span class="ansiyellow"></span>
+
+<span class="ansigreen">/home/joerg/applications/anaconda3/lib/python3.5/site-packages/astropy-1.1.dev14570-py3.5-linux-x86_64.egg/astropy/cosmology/core.py</span> in <span class="ansicyan">angular_diameter_distance_z1z2</span><span class="ansiblue">(self, z1, z2)</span>
+<span class="ansigreen">   1333</span> <span class="ansiyellow"></span>
+<span class="ansigreen">   1334</span>         <span class="ansigreen">if</span> <span class="ansiyellow">(</span>z1 <span class="ansiyellow">&gt;</span> z2<span class="ansiyellow">)</span><span class="ansiyellow">.</span>any<span class="ansiyellow">(</span><span class="ansiyellow">)</span><span class="ansiyellow">:</span><span class="ansiyellow"></span>
+<span class="ansigreen">-&gt; 1335</span><span class="ansiyellow">             </span><span class="ansigreen">raise</span> ValueError<span class="ansiyellow">(</span><span class="ansiblue">&apos;z2 must greater than z1&apos;</span><span class="ansiyellow">)</span><span class="ansiyellow"></span>
+<span class="ansigreen">   1336</span> <span class="ansiyellow"></span>
+<span class="ansigreen">   1337</span>         dm1 <span class="ansiyellow">=</span> self<span class="ansiyellow">.</span>comoving_transverse_distance<span class="ansiyellow">(</span>z1<span class="ansiyellow">)</span><span class="ansiyellow">.</span>value<span class="ansiyellow"></span>
+
+<span class="ansired">ValueError</span>: z2 must greater than z1</pre>
+</div></pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Oops! What happended? I had just set everything smaller than <code>zl</code> to <code>zl</code> and our check above confirmed that there are no values smaller than <code>zl</code> in <code>z</code>. Let&#8217;s check&nbsp;again:</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[5]:</div>
+
+<div class="inner_cell">
+    <div class="input_area">
+        <div class=" highlight hl-ipython3"><pre><span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="n">zl</span><span class="p">,</span> <span class="n">z</span><span class="o">.</span><span class="n">size</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">z</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">zl</span> <span class="o">&gt;</span> <span class="n">z</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area"><div class="prompt output_prompt">Out[5]:</div>
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre class="ipynb">(True, False)</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Weird. What ared these&nbsp;values?</p>
+<p>The check works for scalar/array but not for array/array. Actually the check of course works, but there&#8217;s a subtlety going on, as we&#8217;ll see in a&nbsp;moment.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[7]:</div>
+
+<div class="inner_cell">
+    <div class="input_area">
+        <div class=" highlight hl-ipython3"><pre><span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">equal</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="n">zl</span><span class="p">,</span> <span class="n">z</span><span class="o">.</span><span class="n">size</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">z</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">idx</span><span class="p">)))</span>
+</pre></div>
+
+    </div>
+</div>
+
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area"><div class="prompt output_prompt">Out[7]:</div>
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre class="ipynb">True</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>So culprits are the elements we just set to <code>zl</code>. Lets see what they&nbsp;are.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[8]:</div>
+
+<div class="inner_cell">
+    <div class="input_area">
+        <div class=" highlight hl-ipython3"><pre><span class="n">z</span><span class="p">[</span><span class="n">idx</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="n">zl</span><span class="p">,</span> <span class="n">z</span><span class="o">.</span><span class="n">size</span><span class="p">)[</span><span class="n">idx</span><span class="p">]</span>
+</pre></div>
+
+    </div>
+</div>
+
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area"><div class="prompt output_prompt">Out[8]:</div>
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre class="ipynb">(array([ 0.31999999,  0.31999999,  0.31999999,  0.31999999,  0.31999999,
+         0.31999999,  0.31999999,  0.31999999,  0.31999999,  0.31999999,
+         0.31999999,  0.31999999,  0.31999999,  0.31999999,  0.31999999,
+         0.31999999,  0.31999999,  0.31999999,  0.31999999,  0.31999999,
+         0.31999999,  0.31999999,  0.31999999,  0.31999999,  0.31999999,
+         0.31999999,  0.31999999,  0.31999999,  0.31999999,  0.31999999,
+         0.31999999,  0.31999999,  0.31999999,  0.31999999,  0.31999999,
+         0.31999999,  0.31999999,  0.31999999,  0.31999999,  0.31999999,
+         0.31999999,  0.31999999,  0.31999999,  0.31999999,  0.31999999,
+         0.31999999,  0.31999999,  0.31999999,  0.31999999], dtype=float32),
+ array([ 0.32,  0.32,  0.32,  0.32,  0.32,  0.32,  0.32,  0.32,  0.32,
+         0.32,  0.32,  0.32,  0.32,  0.32,  0.32,  0.32,  0.32,  0.32,
+         0.32,  0.32,  0.32,  0.32,  0.32,  0.32,  0.32,  0.32,  0.32,
+         0.32,  0.32,  0.32,  0.32,  0.32,  0.32,  0.32,  0.32,  0.32,
+         0.32,  0.32,  0.32,  0.32,  0.32,  0.32,  0.32,  0.32,  0.32,
+         0.32,  0.32,  0.32,  0.32]))</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Clearly a round-off error. But why? We just set the array elements to exactly this value. Wait. Notice that the first array has a <code>dtype=float32</code> but the second array does not have a <code>dtype</code> specified, i.e., it is a standard <code>float64</code> array. This is where the problem is. <code>z</code> came from a <span class="caps">FITS</span> table, which has a 32 bit wide float column and that&#8217;s just what astropy gave us. Comparing to a 64 bit float array led to inevitable round-off errors, while apparently the correct cast is made when comparing a 32 bit float array to a 64 bit&nbsp;scalar.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[9]:</div>
+
+<div class="inner_cell">
+    <div class="input_area">
+        <div class=" highlight hl-ipython3"><pre><span class="n">z</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">(</span><span class="n">z</span><span class="p">)</span>
+<span class="n">z</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">zl</span>
+<span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="n">zl</span><span class="p">,</span> <span class="n">z</span><span class="o">.</span><span class="n">size</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">(</span><span class="n">z</span><span class="p">))</span>
+</pre></div>
+
+    </div>
+</div>
+
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area"><div class="prompt output_prompt">Out[9]:</div>
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre class="ipynb">False</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Converting to float64 before the assignment fixes this problem. This took me a while to figure&nbsp;out.</p>
+<p><small>
+<a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/">This blog post is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/">Creative Commons Attribution-ShareAlike 4.0 International License</a>. This post was written as a <a href="http://www.jupyter.org/">Jupyter Notebook</a> in Python. You can <a href="https://raw.githubusercontent.com/joergdietrich/joergdietrich.github.io/master/notebooks/float_precision.ipynb">download</a> the original notebook.</small></p>
+
+</div>
+</div>
+</div></p></div>
+    <footer>
+<p class="meta">
+  <span class="byline author vcard">
+    Posted by <span class="fn">Jörg Dietrich</span>
+  </span>
+<time datetime="2016-02-17T00:00:00+01:00" pubdate>Wed 17 February 2016</time>  <span class="categories">
+    <a class="category" href="http://joergdietrich.github.io/tag/python.html">python</a>
+    <a class="category" href="http://joergdietrich.github.io/tag/numpy.html">numpy</a>
+    <a class="category" href="http://joergdietrich.github.io/tag/astropy.html">astropy</a>
+    <a class="category" href="http://joergdietrich.github.io/tag/scientific-computing.html">scientific computing</a>
+  </span>
+</p><div class="sharing">
+</div>    </footer>
+  </article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript></div>
+  </section>
+</div>
 <aside class="sidebar">
   <section>
     <h1>Recent Posts</h1>
     <ul id="recent_posts">
+      <li class="post">
+          <a href="http://joergdietrich.github.io/floating-point-fun.html">Fun with Floating Point Precision in numpy</a>
+      </li>
+      <li class="post">
+          <a href="http://joergdietrich.github.io/are-theorists-smarter.html">Are Theorists Smarter Than Observers?</a>
+      </li>
+      <li class="post">
+          <a href="http://joergdietrich.github.io/python-physics-equations.html">Making Your Python Code Look Like Physics Equations</a>
+      </li>
+      <li class="post">
+          <a href="http://joergdietrich.github.io/quantitative-data-disagreement.html">How Much Do My Measurements Disagree?</a>
+      </li>
       <li class="post">
           <a href="http://joergdietrich.github.io/notebook-collapse-input.html">Blogging with IPython and Collapsible Input Cells</a>
       </li>
@@ -360,6 +734,9 @@ jQuery(document).ready(function($) {
 </script>
 	<script type="text/javascript">
 	  var disqus_shortname = 'randomuniverse';
+          var disqus_identifier = '/floating-point-fun.html';
+          var disqus_url = 'http://joergdietrich.github.io/floating-point-fun.html';
+          var disqus_title = 'Fun with Floating Point Precision in&nbsp;numpy';
 	  (function() {
 	    var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
 	    dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
