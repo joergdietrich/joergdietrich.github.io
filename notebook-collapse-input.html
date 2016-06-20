@@ -59,8 +59,10 @@
 .highlight .err { border: 1px solid #FF0000 } /* Error */
 .highlight .k { color: #008000; font-weight: bold } /* Keyword */
 .highlight .o { color: #666666 } /* Operator */
+.highlight .ch { color: #408080; font-style: italic } /* Comment.Hashbang */
 .highlight .cm { color: #408080; font-style: italic } /* Comment.Multiline */
 .highlight .cp { color: #BC7A00 } /* Comment.Preproc */
+.highlight .cpf { color: #408080; font-style: italic } /* Comment.PreprocFile */
 .highlight .c1 { color: #408080; font-style: italic } /* Comment.Single */
 .highlight .cs { color: #408080; font-style: italic } /* Comment.Special */
 .highlight .gd { color: #A00000 } /* Generic.Deleted */
@@ -301,10 +303,10 @@ jQuery(document).ready(function($) {
 
 <div class="collapseheader inner_cell"><span style="font-weight: bold;">Expand Code</span>
 <div class="input_area" style="display:none">
-<div class=" highlight hl-ipython2"><pre><span class="o">%</span><span class="k">matplotlib</span> inline
+<div class=" highlight hl-ipython2"><pre><span></span><span class="o">%</span><span class="k">matplotlib</span> inline
 
-<span class="c"># Example code from matplotlib</span>
-<span class="c"># Copyright (c) 2012-2013 Matplotlib Development Team; All Rights Reserved</span>
+<span class="c1"># Example code from matplotlib</span>
+<span class="c1"># Copyright (c) 2012-2013 Matplotlib Development Team; All Rights Reserved</span>
 <span class="kn">import</span> <span class="nn">numpy.random</span>
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="kn">as</span> <span class="nn">plt</span>
 
@@ -319,22 +321,22 @@ jQuery(document).ready(function($) {
 <span class="n">x2</span> <span class="o">=</span> <span class="mf">1.</span> <span class="o">+</span> <span class="n">numpy</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span>
 <span class="n">y2</span> <span class="o">=</span> <span class="mf">1.</span> <span class="o">+</span> <span class="n">numpy</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span>
 
-<span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">x1</span><span class="p">,</span> <span class="n">y1</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s">&quot;r&quot;</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">x2</span><span class="p">,</span> <span class="n">y2</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s">&quot;g&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">x1</span><span class="p">,</span> <span class="n">y1</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;r&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">x2</span><span class="p">,</span> <span class="n">y2</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;g&quot;</span><span class="p">)</span>
 
-<span class="n">bbox_props</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">boxstyle</span><span class="o">=</span><span class="s">&quot;round&quot;</span><span class="p">,</span> <span class="n">fc</span><span class="o">=</span><span class="s">&quot;w&quot;</span><span class="p">,</span> <span class="n">ec</span><span class="o">=</span><span class="s">&quot;0.5&quot;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.9</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="s">&quot;Sample A&quot;</span><span class="p">,</span> <span class="n">ha</span><span class="o">=</span><span class="s">&quot;center&quot;</span><span class="p">,</span> <span class="n">va</span><span class="o">=</span><span class="s">&quot;center&quot;</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span>
+<span class="n">bbox_props</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">boxstyle</span><span class="o">=</span><span class="s2">&quot;round&quot;</span><span class="p">,</span> <span class="n">fc</span><span class="o">=</span><span class="s2">&quot;w&quot;</span><span class="p">,</span> <span class="n">ec</span><span class="o">=</span><span class="s2">&quot;0.5&quot;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.9</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="s2">&quot;Sample A&quot;</span><span class="p">,</span> <span class="n">ha</span><span class="o">=</span><span class="s2">&quot;center&quot;</span><span class="p">,</span> <span class="n">va</span><span class="o">=</span><span class="s2">&quot;center&quot;</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span>
         <span class="n">bbox</span><span class="o">=</span><span class="n">bbox_props</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="s">&quot;Sample B&quot;</span><span class="p">,</span> <span class="n">ha</span><span class="o">=</span><span class="s">&quot;center&quot;</span><span class="p">,</span> <span class="n">va</span><span class="o">=</span><span class="s">&quot;center&quot;</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="s2">&quot;Sample B&quot;</span><span class="p">,</span> <span class="n">ha</span><span class="o">=</span><span class="s2">&quot;center&quot;</span><span class="p">,</span> <span class="n">va</span><span class="o">=</span><span class="s2">&quot;center&quot;</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span>
         <span class="n">bbox</span><span class="o">=</span><span class="n">bbox_props</span><span class="p">)</span>
 
-<span class="n">bbox_props</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">boxstyle</span><span class="o">=</span><span class="s">&quot;rarrow&quot;</span><span class="p">,</span> <span class="n">fc</span><span class="o">=</span><span class="p">(</span><span class="mf">0.8</span><span class="p">,</span><span class="mf">0.9</span><span class="p">,</span><span class="mf">0.9</span><span class="p">),</span> <span class="n">ec</span><span class="o">=</span><span class="s">&quot;b&quot;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
-<span class="n">t</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="s">&quot;Direction&quot;</span><span class="p">,</span> <span class="n">ha</span><span class="o">=</span><span class="s">&quot;center&quot;</span><span class="p">,</span> <span class="n">va</span><span class="o">=</span><span class="s">&quot;center&quot;</span><span class="p">,</span> <span class="n">rotation</span><span class="o">=</span><span class="mi">45</span><span class="p">,</span>
+<span class="n">bbox_props</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">boxstyle</span><span class="o">=</span><span class="s2">&quot;rarrow&quot;</span><span class="p">,</span> <span class="n">fc</span><span class="o">=</span><span class="p">(</span><span class="mf">0.8</span><span class="p">,</span><span class="mf">0.9</span><span class="p">,</span><span class="mf">0.9</span><span class="p">),</span> <span class="n">ec</span><span class="o">=</span><span class="s2">&quot;b&quot;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">t</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;Direction&quot;</span><span class="p">,</span> <span class="n">ha</span><span class="o">=</span><span class="s2">&quot;center&quot;</span><span class="p">,</span> <span class="n">va</span><span class="o">=</span><span class="s2">&quot;center&quot;</span><span class="p">,</span> <span class="n">rotation</span><span class="o">=</span><span class="mi">45</span><span class="p">,</span>
             <span class="n">size</span><span class="o">=</span><span class="mi">15</span><span class="p">,</span>
             <span class="n">bbox</span><span class="o">=</span><span class="n">bbox_props</span><span class="p">)</span>
 
 <span class="n">bb</span> <span class="o">=</span> <span class="n">t</span><span class="o">.</span><span class="n">get_bbox_patch</span><span class="p">()</span>
-<span class="n">bb</span><span class="o">.</span><span class="n">set_boxstyle</span><span class="p">(</span><span class="s">&quot;rarrow&quot;</span><span class="p">,</span> <span class="n">pad</span><span class="o">=</span><span class="mf">0.6</span><span class="p">)</span>
+<span class="n">bb</span><span class="o">.</span><span class="n">set_boxstyle</span><span class="p">(</span><span class="s2">&quot;rarrow&quot;</span><span class="p">,</span> <span class="n">pad</span><span class="o">=</span><span class="mf">0.6</span><span class="p">)</span>
 
 <span class="n">ax</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">(</span><span class="o">-</span><span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="o">-</span><span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
@@ -673,7 +675,7 @@ QmCC
 
 <div class="collapseheader inner_cell"><span style="font-weight: bold;">Collapse Code</span>
 <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span class="n">x</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="mi">1000</span><span class="p">)</span>
+<div class=" highlight hl-ipython2"><pre><span></span><span class="n">x</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="mi">1000</span><span class="p">)</span>
 <span class="n">y</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="mi">1000</span><span class="p">)</span>
 <span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span><span class="mi">5</span><span class="p">))</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
@@ -1248,6 +1250,9 @@ RK5CYII=
     <h1>Recent Posts</h1>
     <ul id="recent_posts">
       <li class="post">
+          <a href="http://joergdietrich.github.io/emcee-convergence.html">Convergence of the Affine Invariant Ensemble Sampler</a>
+      </li>
+      <li class="post">
           <a href="http://joergdietrich.github.io/floating-point-fun.html">Fun with Floating Point Precision in numpy</a>
       </li>
       <li class="post">
@@ -1258,9 +1263,6 @@ RK5CYII=
       </li>
       <li class="post">
           <a href="http://joergdietrich.github.io/quantitative-data-disagreement.html">How Much Do My Measurements Disagree?</a>
-      </li>
-      <li class="post">
-          <a href="http://joergdietrich.github.io/notebook-collapse-input.html">Blogging with IPython and Collapsible Input Cells</a>
       </li>
     </ul>
   </section>
@@ -1275,7 +1277,7 @@ RK5CYII=
 
   <section>
   <h1>Tags</h1>
-    <a href="http://joergdietrich.github.io/tag/python.html">python</a>,    <a href="http://joergdietrich.github.io/tag/data-analysis.html">data analysis</a>,    <a href="http://joergdietrich.github.io/tag/sociology-of-science.html">sociology of science</a>,    <a href="http://joergdietrich.github.io/tag/numpy.html">numpy</a>,    <a href="http://joergdietrich.github.io/tag/statistics.html">statistics</a>,    <a href="http://joergdietrich.github.io/tag/pelican.html">pelican</a>,    <a href="http://joergdietrich.github.io/tag/notebook.html">notebook</a>,    <a href="http://joergdietrich.github.io/tag/astropy.html">astropy</a>,    <a href="http://joergdietrich.github.io/tag/blogging.html">blogging</a>,    <a href="http://joergdietrich.github.io/tag/scientific-computing.html">scientific computing</a>  </section>
+    <a href="http://joergdietrich.github.io/tag/sociology-of-science.html">sociology of science</a>,    <a href="http://joergdietrich.github.io/tag/emcee.html">emcee</a>,    <a href="http://joergdietrich.github.io/tag/scientific-computing.html">scientific computing</a>,    <a href="http://joergdietrich.github.io/tag/blogging.html">blogging</a>,    <a href="http://joergdietrich.github.io/tag/astropy.html">astropy</a>,    <a href="http://joergdietrich.github.io/tag/numpy.html">numpy</a>,    <a href="http://joergdietrich.github.io/tag/pelican.html">pelican</a>,    <a href="http://joergdietrich.github.io/tag/monte-carlo.html">monte carlo</a>,    <a href="http://joergdietrich.github.io/tag/notebook.html">notebook</a>,    <a href="http://joergdietrich.github.io/tag/data-analysis.html">data analysis</a>,    <a href="http://joergdietrich.github.io/tag/statistics.html">statistics</a>,    <a href="http://joergdietrich.github.io/tag/python.html">python</a>  </section>
 
 
 
