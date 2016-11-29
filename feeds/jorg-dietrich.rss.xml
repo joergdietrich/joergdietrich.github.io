@@ -1,5 +1,412 @@
 <?xml version="1.0" encoding="utf-8"?>
-<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Random Thoughts in a Random Universe</title><link>http://joergdietrich.github.io/</link><description></description><atom:link href="/feeds/jorg-dietrich.rss.xml" rel="self"></atom:link><lastBuildDate>Mon, 20 Jun 2016 00:00:00 +0200</lastBuildDate><item><title>Convergence of the Affine Invariant Ensemble Sampler</title><link>http://joergdietrich.github.io/emcee-convergence.html</link><description>&lt;p&gt;
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Random Thoughts in a Random Universe</title><link>http://joergdietrich.github.io/</link><description></description><atom:link href="/feeds/jorg-dietrich.rss.xml" rel="self"></atom:link><lastBuildDate>Tue, 29 Nov 2016 00:00:00 +0100</lastBuildDate><item><title>Python and numpy Bool Types</title><link>http://joergdietrich.github.io/python-numpy-bool-types.html</link><description>&lt;p&gt;
+&lt;div class="cell border-box-sizing text_cell rendered"&gt;
+&lt;div class="prompt input_prompt"&gt;
+&lt;/div&gt;
+&lt;div class="inner_cell"&gt;
+&lt;div class="text_cell_render border-box-sizing rendered_html"&gt;
+&lt;p&gt;This blog post is triggered by a colleague stopping me in the hall and asking &amp;#8220;What does &lt;code&gt;~&lt;/code&gt; do in Python?&amp;#8221; She was surprised by the behavior of the &lt;code&gt;~&lt;/code&gt; operator when applied to Python bool types and I was surprised that it behaved differently on numpy bools than on Python bools. All in all enough surprises to write a short blog post about the difference between the two variable&amp;nbsp;types.&lt;/p&gt;
+
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="cell border-box-sizing text_cell rendered"&gt;
+&lt;div class="prompt input_prompt"&gt;
+&lt;/div&gt;
+&lt;div class="inner_cell"&gt;
+&lt;div class="text_cell_render border-box-sizing rendered_html"&gt;
+&lt;h2 id="The-~-Operator"&gt;The &lt;code&gt;~&lt;/code&gt; Operator&lt;a class="anchor-link" href="#The-~-Operator"&gt;&amp;#182;&lt;/a&gt;&lt;/h2&gt;&lt;p&gt;Let&amp;#8217;s start with the original question, what does &lt;code&gt;~n&lt;/code&gt; do in Python? Answer: &lt;a href="https://docs.python.org/3/library/stdtypes.html#bitwise-operations-on-integer-types"&gt;It inverts the bits of &lt;code&gt;n&lt;/code&gt;&lt;/a&gt;, where &lt;code&gt;n&lt;/code&gt; is an integer. So for&amp;nbsp;example:&lt;/p&gt;
+
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="cell border-box-sizing code_cell rendered"&gt;
+&lt;div class="input"&gt;
+&lt;div class="prompt input_prompt"&gt;In&amp;nbsp;[1]:&lt;/div&gt;
+
+&lt;div class="inner_cell"&gt;
+    &lt;div class="input_area"&gt;
+        &lt;div class=" highlight hl-ipython3"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;n&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mi"&gt;85&lt;/span&gt;
+&lt;span class="nb"&gt;print&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot; &lt;/span&gt;&lt;span class="si"&gt;{0:d}&lt;/span&gt;&lt;span class="s2"&gt; in binary: &lt;/span&gt;&lt;span class="si"&gt;{0:+b}&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;format&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;n&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+&lt;span class="nb"&gt;print&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;~&lt;/span&gt;&lt;span class="si"&gt;{0:d}&lt;/span&gt;&lt;span class="s2"&gt; in binary: &lt;/span&gt;&lt;span class="si"&gt;{1:+b}&lt;/span&gt;&lt;span class="s2"&gt; is &lt;/span&gt;&lt;span class="si"&gt;{1:d}&lt;/span&gt;&lt;span class="s2"&gt; in integer&amp;quot;&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;format&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;n&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="o"&gt;~&lt;/span&gt;&lt;span class="n"&gt;n&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+    &lt;/div&gt;
+&lt;/div&gt;
+
+&lt;/div&gt;
+
+&lt;div class="output_wrapper"&gt;
+&lt;div class="output"&gt;
+
+
+&lt;div class="output_area"&gt;&lt;div class="prompt"&gt;&lt;/div&gt;
+&lt;div class="output_subarea output_stream output_stdout output_text"&gt;
+&lt;pre class="ipynb"&gt; 85 in binary: +1010101
+~85 in binary: -1010110 is -86 in integer
+&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;/div&gt;
+&lt;div class="cell border-box-sizing text_cell rendered"&gt;
+&lt;div class="prompt input_prompt"&gt;
+&lt;/div&gt;
+&lt;div class="inner_cell"&gt;
+&lt;div class="text_cell_render border-box-sizing rendered_html"&gt;
+&lt;p&gt;You may find it surprising that &lt;code&gt;~85&lt;/code&gt; does not return the bit pattern &lt;code&gt;0101010&lt;/code&gt; but this is just due to the &lt;a href="https://wiki.python.org/moin/BitwiseOperators"&gt;two&amp;#8217;s complement&lt;/a&gt; representation of integers in&amp;nbsp;Python.&lt;/p&gt;
+&lt;h2 id="Python-bool"&gt;Python bool&lt;a class="anchor-link" href="#Python-bool"&gt;&amp;#182;&lt;/a&gt;&lt;/h2&gt;&lt;p&gt;Understanding two&amp;#8217;s complement and knowing that Python &lt;code&gt;bool&lt;/code&gt;s are a subclass of &lt;code&gt;int&lt;/code&gt;, it is not surprising&amp;nbsp;that&lt;/p&gt;
+
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="cell border-box-sizing code_cell rendered"&gt;
+&lt;div class="input"&gt;
+&lt;div class="prompt input_prompt"&gt;In&amp;nbsp;[2]:&lt;/div&gt;
+
+&lt;div class="inner_cell"&gt;
+    &lt;div class="input_area"&gt;
+        &lt;div class=" highlight hl-ipython3"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="nb"&gt;print&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot; True in binary:  &lt;/span&gt;&lt;span class="si"&gt;{:s}&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;format&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;bin&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kc"&gt;True&lt;/span&gt;&lt;span class="p"&gt;)))&lt;/span&gt;
+&lt;span class="nb"&gt;print&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;~True in binary: &lt;/span&gt;&lt;span class="si"&gt;{:s}&lt;/span&gt;&lt;span class="s2"&gt; is &lt;/span&gt;&lt;span class="si"&gt;{:d}&lt;/span&gt;&lt;span class="s2"&gt; in integer&amp;quot;&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;format&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;bin&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="o"&gt;~&lt;/span&gt;&lt;span class="kc"&gt;True&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt; &lt;span class="o"&gt;~&lt;/span&gt;&lt;span class="kc"&gt;True&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+    &lt;/div&gt;
+&lt;/div&gt;
+
+&lt;/div&gt;
+
+&lt;div class="output_wrapper"&gt;
+&lt;div class="output"&gt;
+
+
+&lt;div class="output_area"&gt;&lt;div class="prompt"&gt;&lt;/div&gt;
+&lt;div class="output_subarea output_stream output_stdout output_text"&gt;
+&lt;pre class="ipynb"&gt; True in binary:  0b1
+~True in binary: -0b10 is -2 in integer
+&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;/div&gt;
+&lt;div class="cell border-box-sizing text_cell rendered"&gt;
+&lt;div class="prompt input_prompt"&gt;
+&lt;/div&gt;
+&lt;div class="inner_cell"&gt;
+&lt;div class="text_cell_render border-box-sizing rendered_html"&gt;
+&lt;p&gt;and so the truth value of &lt;code&gt;~True&lt;/code&gt; is &lt;code&gt;True&lt;/code&gt;:&lt;/p&gt;
+
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="cell border-box-sizing code_cell rendered"&gt;
+&lt;div class="input"&gt;
+&lt;div class="prompt input_prompt"&gt;In&amp;nbsp;[3]:&lt;/div&gt;
+
+&lt;div class="inner_cell"&gt;
+    &lt;div class="input_area"&gt;
+        &lt;div class=" highlight hl-ipython3"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="nb"&gt;print&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;bool&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="o"&gt;~&lt;/span&gt;&lt;span class="kc"&gt;True&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+    &lt;/div&gt;
+&lt;/div&gt;
+
+&lt;/div&gt;
+
+&lt;div class="output_wrapper"&gt;
+&lt;div class="output"&gt;
+
+
+&lt;div class="output_area"&gt;&lt;div class="prompt"&gt;&lt;/div&gt;
+&lt;div class="output_subarea output_stream output_stdout output_text"&gt;
+&lt;pre class="ipynb"&gt;True
+&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;/div&gt;
+&lt;div class="cell border-box-sizing text_cell rendered"&gt;
+&lt;div class="prompt input_prompt"&gt;
+&lt;/div&gt;
+&lt;div class="inner_cell"&gt;
+&lt;div class="text_cell_render border-box-sizing rendered_html"&gt;
+&lt;p&gt;because any integer other than zero evaluates to &lt;code&gt;True&lt;/code&gt;. This may come as a surprise if you are not aware that bools in Python are in fact integers, which use two&amp;#8217;s complement. It&amp;#8217;s even a little bit more confusing&amp;nbsp;because&lt;/p&gt;
+
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="cell border-box-sizing code_cell rendered"&gt;
+&lt;div class="input"&gt;
+&lt;div class="prompt input_prompt"&gt;In&amp;nbsp;[4]:&lt;/div&gt;
+
+&lt;div class="inner_cell"&gt;
+    &lt;div class="input_area"&gt;
+        &lt;div class=" highlight hl-ipython3"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="nb"&gt;print&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="o"&gt;~&lt;/span&gt;&lt;span class="kc"&gt;False&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nb"&gt;bool&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="o"&gt;~&lt;/span&gt;&lt;span class="kc"&gt;False&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+    &lt;/div&gt;
+&lt;/div&gt;
+
+&lt;/div&gt;
+
+&lt;div class="output_wrapper"&gt;
+&lt;div class="output"&gt;
+
+
+&lt;div class="output_area"&gt;&lt;div class="prompt"&gt;&lt;/div&gt;
+&lt;div class="output_subarea output_stream output_stdout output_text"&gt;
+&lt;pre class="ipynb"&gt;-1 True
+&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;/div&gt;
+&lt;div class="cell border-box-sizing text_cell rendered"&gt;
+&lt;div class="prompt input_prompt"&gt;
+&lt;/div&gt;
+&lt;div class="inner_cell"&gt;
+&lt;div class="text_cell_render border-box-sizing rendered_html"&gt;
+&lt;p&gt;&lt;code&gt;~False&lt;/code&gt; in fact evaluates to True. If you want to correctly negate Python boolean values use logical &lt;code&gt;not&lt;/code&gt; and not bitwise not (&lt;code&gt;~&lt;/code&gt;):&lt;/p&gt;
+
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="cell border-box-sizing code_cell rendered"&gt;
+&lt;div class="input"&gt;
+&lt;div class="prompt input_prompt"&gt;In&amp;nbsp;[5]:&lt;/div&gt;
+
+&lt;div class="inner_cell"&gt;
+    &lt;div class="input_area"&gt;
+        &lt;div class=" highlight hl-ipython3"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="nb"&gt;print&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="ow"&gt;not&lt;/span&gt; &lt;span class="kc"&gt;True&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="ow"&gt;not&lt;/span&gt; &lt;span class="kc"&gt;False&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+    &lt;/div&gt;
+&lt;/div&gt;
+
+&lt;/div&gt;
+
+&lt;div class="output_wrapper"&gt;
+&lt;div class="output"&gt;
+
+
+&lt;div class="output_area"&gt;&lt;div class="prompt"&gt;&lt;/div&gt;
+&lt;div class="output_subarea output_stream output_stdout output_text"&gt;
+&lt;pre class="ipynb"&gt;False True
+&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;/div&gt;
+&lt;div class="cell border-box-sizing text_cell rendered"&gt;
+&lt;div class="prompt input_prompt"&gt;
+&lt;/div&gt;
+&lt;div class="inner_cell"&gt;
+&lt;div class="text_cell_render border-box-sizing rendered_html"&gt;
+&lt;h2 id="Numpy-bool"&gt;Numpy bool&lt;a class="anchor-link" href="#Numpy-bool"&gt;&amp;#182;&lt;/a&gt;&lt;/h2&gt;&lt;p&gt;What surprised &lt;em&gt;me&lt;/em&gt; was that numpy bools show a different&amp;nbsp;behavior:&lt;/p&gt;
+
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="cell border-box-sizing code_cell rendered"&gt;
+&lt;div class="input"&gt;
+&lt;div class="prompt input_prompt"&gt;In&amp;nbsp;[6]:&lt;/div&gt;
+
+&lt;div class="inner_cell"&gt;
+    &lt;div class="input_area"&gt;
+        &lt;div class=" highlight hl-ipython3"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="nn"&gt;numpy&lt;/span&gt; &lt;span class="k"&gt;as&lt;/span&gt; &lt;span class="nn"&gt;np&lt;/span&gt;
+&lt;span class="n"&gt;a&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;np&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;ones&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;10&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;dtype&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="nb"&gt;bool&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="nb"&gt;print&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;a&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="nb"&gt;print&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="o"&gt;~&lt;/span&gt;&lt;span class="n"&gt;a&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+    &lt;/div&gt;
+&lt;/div&gt;
+
+&lt;/div&gt;
+
+&lt;div class="output_wrapper"&gt;
+&lt;div class="output"&gt;
+
+
+&lt;div class="output_area"&gt;&lt;div class="prompt"&gt;&lt;/div&gt;
+&lt;div class="output_subarea output_stream output_stdout output_text"&gt;
+&lt;pre class="ipynb"&gt;[ True  True  True  True  True  True  True  True  True  True]
+[False False False False False False False False False False]
+&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;/div&gt;
+&lt;div class="cell border-box-sizing text_cell rendered"&gt;
+&lt;div class="prompt input_prompt"&gt;
+&lt;/div&gt;
+&lt;div class="inner_cell"&gt;
+&lt;div class="text_cell_render border-box-sizing rendered_html"&gt;
+&lt;p&gt;The reason for this is that numpy bools are an entirely different type. They are not an subclass of Python bools and they are also not a subclass of any numeric type. This is all clearly stated in the &lt;a href="https://docs.scipy.org/doc/numpy/reference/arrays.scalars.html#built-in-scalar-types"&gt;numpy reference manual&lt;/a&gt; even with the following&amp;nbsp;warning&lt;/p&gt;
+&lt;blockquote&gt;&lt;p&gt;The bool_ type is not a subclass of the int_ type (the bool_ is not even a number type). This is different than Python’s default implementation of bool as a sub-class of&amp;nbsp;int.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;yet reading this without this example I didn&amp;#8217;t fully understand the&amp;nbsp;consequences.&lt;/p&gt;
+&lt;p&gt;In numpy we can make things even a little more convoluted if we mix Python bools and numpy.bool_ in an object&amp;nbsp;array.&lt;/p&gt;
+
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="cell border-box-sizing code_cell rendered"&gt;
+&lt;div class="input"&gt;
+&lt;div class="prompt input_prompt"&gt;In&amp;nbsp;[7]:&lt;/div&gt;
+
+&lt;div class="inner_cell"&gt;
+    &lt;div class="input_area"&gt;
+        &lt;div class=" highlight hl-ipython3"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;b&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;np&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;array&lt;/span&gt;&lt;span class="p"&gt;([&lt;/span&gt;&lt;span class="kc"&gt;True&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="kc"&gt;True&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="kc"&gt;False&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;np&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;True_&lt;/span&gt;&lt;span class="p"&gt;],&lt;/span&gt; &lt;span class="n"&gt;dtype&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="nb"&gt;object&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="nb"&gt;print&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;b&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;astype&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;np&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;bool&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+&lt;span class="nb"&gt;print&lt;/span&gt;&lt;span class="p"&gt;((&lt;/span&gt;&lt;span class="o"&gt;~&lt;/span&gt;&lt;span class="n"&gt;b&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;astype&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;np&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;bool&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+    &lt;/div&gt;
+&lt;/div&gt;
+
+&lt;/div&gt;
+
+&lt;div class="output_wrapper"&gt;
+&lt;div class="output"&gt;
+
+
+&lt;div class="output_area"&gt;&lt;div class="prompt"&gt;&lt;/div&gt;
+&lt;div class="output_subarea output_stream output_stdout output_text"&gt;
+&lt;pre class="ipynb"&gt;[ True  True False  True]
+[ True  True  True False]
+&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;/div&gt;
+&lt;div class="cell border-box-sizing text_cell rendered"&gt;
+&lt;div class="prompt input_prompt"&gt;
+&lt;/div&gt;
+&lt;div class="inner_cell"&gt;
+&lt;div class="text_cell_render border-box-sizing rendered_html"&gt;
+&lt;p&gt;My advise above to use logical &lt;code&gt;not&lt;/code&gt; also does not work for numpy arrays because &lt;code&gt;not&lt;/code&gt; is not applied element-wise but tries to evaluate the boolean value of the entire&amp;nbsp;array.&lt;/p&gt;
+
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="cell border-box-sizing code_cell rendered"&gt;
+&lt;div class="input"&gt;
+&lt;div class="prompt input_prompt"&gt;In&amp;nbsp;[8]:&lt;/div&gt;
+
+&lt;div class="inner_cell"&gt;
+    &lt;div class="input_area"&gt;
+        &lt;div class=" highlight hl-ipython3"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="nb"&gt;print&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="ow"&gt;not&lt;/span&gt; &lt;span class="n"&gt;b&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+    &lt;/div&gt;
+&lt;/div&gt;
+
+&lt;/div&gt;
+
+&lt;div class="output_wrapper"&gt;
+&lt;div class="output"&gt;
+
+
+&lt;div class="output_area"&gt;&lt;div class="prompt"&gt;&lt;/div&gt;
+&lt;div class="output_subarea output_text output_error"&gt;
+&lt;pre class="ipynb"&gt;&lt;div class="output_subarea output_text output_error"&gt;
+&lt;pre&gt;
+&lt;span class="ansi-red-fg"&gt;---------------------------------------------------------------------------&lt;/span&gt;
+&lt;span class="ansi-red-fg"&gt;ValueError&lt;/span&gt;                                Traceback (most recent call last)
+&lt;span class="ansi-green-fg"&gt;&amp;lt;ipython-input-8-c236fbab03dc&amp;gt;&lt;/span&gt; in &lt;span class="ansi-cyan-fg"&gt;&amp;lt;module&amp;gt;&lt;/span&gt;&lt;span class="ansi-blue-fg"&gt;()&lt;/span&gt;
+&lt;span class="ansi-green-fg"&gt;----&amp;gt; 1&lt;/span&gt;&lt;span class="ansi-red-fg"&gt; &lt;/span&gt;print&lt;span class="ansi-blue-fg"&gt;(&lt;/span&gt;&lt;span class="ansi-green-fg"&gt;not&lt;/span&gt; b&lt;span class="ansi-blue-fg"&gt;)&lt;/span&gt;
+
+&lt;span class="ansi-red-fg"&gt;ValueError&lt;/span&gt;: The truth value of an array with more than one element is ambiguous. Use a.any() or a.all()&lt;/pre&gt;
+&lt;/div&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;/div&gt;
+&lt;div class="cell border-box-sizing text_cell rendered"&gt;
+&lt;div class="prompt input_prompt"&gt;
+&lt;/div&gt;
+&lt;div class="inner_cell"&gt;
+&lt;div class="text_cell_render border-box-sizing rendered_html"&gt;
+&lt;p&gt;The correct thing to do for numpy arrays is to use the ufunc &lt;code&gt;logical_not&lt;/code&gt;, which gives the expected result for both our arrays &lt;code&gt;a&lt;/code&gt; and &lt;code&gt;b&lt;/code&gt;&lt;/p&gt;
+
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="cell border-box-sizing code_cell rendered"&gt;
+&lt;div class="input"&gt;
+&lt;div class="prompt input_prompt"&gt;In&amp;nbsp;[9]:&lt;/div&gt;
+
+&lt;div class="inner_cell"&gt;
+    &lt;div class="input_area"&gt;
+        &lt;div class=" highlight hl-ipython3"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="nb"&gt;print&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;Array a&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="nb"&gt;print&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;a&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="nb"&gt;print&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;np&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;logical_not&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;a&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+&lt;span class="nb"&gt;print&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="se"&gt;\n&lt;/span&gt;&lt;span class="s2"&gt;Array b&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="nb"&gt;print&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;b&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="nb"&gt;print&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;np&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;logical_not&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;b&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+    &lt;/div&gt;
+&lt;/div&gt;
+
+&lt;/div&gt;
+
+&lt;div class="output_wrapper"&gt;
+&lt;div class="output"&gt;
+
+
+&lt;div class="output_area"&gt;&lt;div class="prompt"&gt;&lt;/div&gt;
+&lt;div class="output_subarea output_stream output_stdout output_text"&gt;
+&lt;pre class="ipynb"&gt;Array a
+[ True  True  True  True  True  True  True  True  True  True]
+[False False False False False False False False False False]
+
+Array b
+[True True False True]
+[False False True False]
+&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;/div&gt;
+&lt;div class="cell border-box-sizing text_cell rendered"&gt;
+&lt;div class="prompt input_prompt"&gt;
+&lt;/div&gt;
+&lt;div class="inner_cell"&gt;
+&lt;div class="text_cell_render border-box-sizing rendered_html"&gt;
+&lt;p&gt;&lt;small&gt;
+&lt;a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/"&gt;This blog post is licensed under a &lt;a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/"&gt;Creative Commons Attribution-ShareAlike 4.0 International License&lt;/a&gt;. This post was written as a &lt;a href="http://www.jupyter.org/"&gt;Jupyter Notebook&lt;/a&gt; in Python. You can &lt;a href="https://raw.githubusercontent.com/joergdietrich/joergdietrich.github.io/master/notebooks/BoolTypes.ipynb"&gt;download&lt;/a&gt; the original notebook.&lt;/small&gt;&lt;/p&gt;
+
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">Jörg Dietrich</dc:creator><pubDate>Tue, 29 Nov 2016 00:00:00 +0100</pubDate><guid>tag:joergdietrich.github.io,2016-11-29:python-numpy-bool-types.html</guid><category>python</category><category>numpy</category><category>scientific computing</category></item><item><title>Convergence of the Affine Invariant Ensemble Sampler</title><link>http://joergdietrich.github.io/emcee-convergence.html</link><description>&lt;p&gt;
 &lt;div class="cell border-box-sizing text_cell rendered"&gt;
 &lt;div class="prompt input_prompt"&gt;
 &lt;/div&gt;
@@ -14699,19 +15106,19 @@ PgW8g9sO5Ewp8yUiq0sBkIiIiGw5GgMkIiIiW44CIBEREdlyFACJiIjIlqMASERERLYcBUAiIiKy
 &lt;div class="output_subarea output_text output_error"&gt;
 &lt;pre class="ipynb"&gt;&lt;div class="output_subarea output_text output_error"&gt;
 &lt;pre&gt;
-&lt;span class="ansired"&gt;---------------------------------------------------------------------------&lt;/span&gt;
-&lt;span class="ansired"&gt;ValueError&lt;/span&gt;                                Traceback (most recent call last)
-&lt;span class="ansigreen"&gt;&amp;lt;ipython-input-4-f71b9851644c&amp;gt;&lt;/span&gt; in &lt;span class="ansicyan"&gt;&amp;lt;module&amp;gt;&lt;/span&gt;&lt;span class="ansiblue"&gt;()&lt;/span&gt;
-&lt;span class="ansigreen"&gt;----&amp;gt; 1&lt;/span&gt;&lt;span class="ansiyellow"&gt; &lt;/span&gt;dls &lt;span class="ansiyellow"&gt;=&lt;/span&gt; cosmo&lt;span class="ansiyellow"&gt;.&lt;/span&gt;angular_diameter_distance_z1z2&lt;span class="ansiyellow"&gt;(&lt;/span&gt;np&lt;span class="ansiyellow"&gt;.&lt;/span&gt;repeat&lt;span class="ansiyellow"&gt;(&lt;/span&gt;zl&lt;span class="ansiyellow"&gt;,&lt;/span&gt; z&lt;span class="ansiyellow"&gt;.&lt;/span&gt;size&lt;span class="ansiyellow"&gt;)&lt;/span&gt;&lt;span class="ansiyellow"&gt;,&lt;/span&gt; z&lt;span class="ansiyellow"&gt;)&lt;/span&gt;&lt;span class="ansiyellow"&gt;&lt;/span&gt;
+&lt;span class="ansi-red-intense-fg ansi-bold"&gt;---------------------------------------------------------------------------&lt;/span&gt;
+&lt;span class="ansi-red-intense-fg ansi-bold"&gt;ValueError&lt;/span&gt;                                Traceback (most recent call last)
+&lt;span class="ansi-green-intense-fg ansi-bold"&gt;&amp;lt;ipython-input-4-f71b9851644c&amp;gt;&lt;/span&gt; in &lt;span class="ansi-cyan-fg"&gt;&amp;lt;module&amp;gt;&lt;/span&gt;&lt;span class="ansi-blue-intense-fg ansi-bold"&gt;()&lt;/span&gt;
+&lt;span class="ansi-green-intense-fg ansi-bold"&gt;----&amp;gt; 1&lt;/span&gt;&lt;span class="ansi-yellow-intense-fg ansi-bold"&gt; &lt;/span&gt;dls &lt;span class="ansi-yellow-intense-fg ansi-bold"&gt;=&lt;/span&gt; cosmo&lt;span class="ansi-yellow-intense-fg ansi-bold"&gt;.&lt;/span&gt;angular_diameter_distance_z1z2&lt;span class="ansi-yellow-intense-fg ansi-bold"&gt;(&lt;/span&gt;np&lt;span class="ansi-yellow-intense-fg ansi-bold"&gt;.&lt;/span&gt;repeat&lt;span class="ansi-yellow-intense-fg ansi-bold"&gt;(&lt;/span&gt;zl&lt;span class="ansi-yellow-intense-fg ansi-bold"&gt;,&lt;/span&gt; z&lt;span class="ansi-yellow-intense-fg ansi-bold"&gt;.&lt;/span&gt;size&lt;span class="ansi-yellow-intense-fg ansi-bold"&gt;)&lt;/span&gt;&lt;span class="ansi-yellow-intense-fg ansi-bold"&gt;,&lt;/span&gt; z&lt;span class="ansi-yellow-intense-fg ansi-bold"&gt;)&lt;/span&gt;
 
-&lt;span class="ansigreen"&gt;/home/joerg/applications/anaconda3/lib/python3.5/site-packages/astropy-1.1.dev14570-py3.5-linux-x86_64.egg/astropy/cosmology/core.py&lt;/span&gt; in &lt;span class="ansicyan"&gt;angular_diameter_distance_z1z2&lt;/span&gt;&lt;span class="ansiblue"&gt;(self, z1, z2)&lt;/span&gt;
-&lt;span class="ansigreen"&gt;   1333&lt;/span&gt; &lt;span class="ansiyellow"&gt;&lt;/span&gt;
-&lt;span class="ansigreen"&gt;   1334&lt;/span&gt;         &lt;span class="ansigreen"&gt;if&lt;/span&gt; &lt;span class="ansiyellow"&gt;(&lt;/span&gt;z1 &lt;span class="ansiyellow"&gt;&amp;gt;&lt;/span&gt; z2&lt;span class="ansiyellow"&gt;)&lt;/span&gt;&lt;span class="ansiyellow"&gt;.&lt;/span&gt;any&lt;span class="ansiyellow"&gt;(&lt;/span&gt;&lt;span class="ansiyellow"&gt;)&lt;/span&gt;&lt;span class="ansiyellow"&gt;:&lt;/span&gt;&lt;span class="ansiyellow"&gt;&lt;/span&gt;
-&lt;span class="ansigreen"&gt;-&amp;gt; 1335&lt;/span&gt;&lt;span class="ansiyellow"&gt;             &lt;/span&gt;&lt;span class="ansigreen"&gt;raise&lt;/span&gt; ValueError&lt;span class="ansiyellow"&gt;(&lt;/span&gt;&lt;span class="ansiblue"&gt;&amp;apos;z2 must greater than z1&amp;apos;&lt;/span&gt;&lt;span class="ansiyellow"&gt;)&lt;/span&gt;&lt;span class="ansiyellow"&gt;&lt;/span&gt;
-&lt;span class="ansigreen"&gt;   1336&lt;/span&gt; &lt;span class="ansiyellow"&gt;&lt;/span&gt;
-&lt;span class="ansigreen"&gt;   1337&lt;/span&gt;         dm1 &lt;span class="ansiyellow"&gt;=&lt;/span&gt; self&lt;span class="ansiyellow"&gt;.&lt;/span&gt;comoving_transverse_distance&lt;span class="ansiyellow"&gt;(&lt;/span&gt;z1&lt;span class="ansiyellow"&gt;)&lt;/span&gt;&lt;span class="ansiyellow"&gt;.&lt;/span&gt;value&lt;span class="ansiyellow"&gt;&lt;/span&gt;
+&lt;span class="ansi-green-intense-fg ansi-bold"&gt;/home/joerg/applications/anaconda3/lib/python3.5/site-packages/astropy-1.1.dev14570-py3.5-linux-x86_64.egg/astropy/cosmology/core.py&lt;/span&gt; in &lt;span class="ansi-cyan-fg"&gt;angular_diameter_distance_z1z2&lt;/span&gt;&lt;span class="ansi-blue-intense-fg ansi-bold"&gt;(self, z1, z2)&lt;/span&gt;
+&lt;span class="ansi-green-fg"&gt;   1333&lt;/span&gt; 
+&lt;span class="ansi-green-fg"&gt;   1334&lt;/span&gt;         &lt;span class="ansi-green-intense-fg ansi-bold"&gt;if&lt;/span&gt; &lt;span class="ansi-yellow-intense-fg ansi-bold"&gt;(&lt;/span&gt;z1 &lt;span class="ansi-yellow-intense-fg ansi-bold"&gt;&amp;gt;&lt;/span&gt; z2&lt;span class="ansi-yellow-intense-fg ansi-bold"&gt;)&lt;/span&gt;&lt;span class="ansi-yellow-intense-fg ansi-bold"&gt;.&lt;/span&gt;any&lt;span class="ansi-yellow-intense-fg ansi-bold"&gt;(&lt;/span&gt;&lt;span class="ansi-yellow-intense-fg ansi-bold"&gt;)&lt;/span&gt;&lt;span class="ansi-yellow-intense-fg ansi-bold"&gt;:&lt;/span&gt;
+&lt;span class="ansi-green-intense-fg ansi-bold"&gt;-&amp;gt; 1335&lt;/span&gt;&lt;span class="ansi-yellow-intense-fg ansi-bold"&gt;             &lt;/span&gt;&lt;span class="ansi-green-intense-fg ansi-bold"&gt;raise&lt;/span&gt; ValueError&lt;span class="ansi-yellow-intense-fg ansi-bold"&gt;(&lt;/span&gt;&lt;span class="ansi-blue-intense-fg ansi-bold"&gt;&amp;#39;z2 must greater than z1&amp;#39;&lt;/span&gt;&lt;span class="ansi-yellow-intense-fg ansi-bold"&gt;)&lt;/span&gt;
+&lt;span class="ansi-green-fg"&gt;   1336&lt;/span&gt; 
+&lt;span class="ansi-green-fg"&gt;   1337&lt;/span&gt;         dm1 &lt;span class="ansi-yellow-intense-fg ansi-bold"&gt;=&lt;/span&gt; self&lt;span class="ansi-yellow-intense-fg ansi-bold"&gt;.&lt;/span&gt;comoving_transverse_distance&lt;span class="ansi-yellow-intense-fg ansi-bold"&gt;(&lt;/span&gt;z1&lt;span class="ansi-yellow-intense-fg ansi-bold"&gt;)&lt;/span&gt;&lt;span class="ansi-yellow-intense-fg ansi-bold"&gt;.&lt;/span&gt;value
 
-&lt;span class="ansired"&gt;ValueError&lt;/span&gt;: z2 must greater than z1&lt;/pre&gt;
+&lt;span class="ansi-red-intense-fg ansi-bold"&gt;ValueError&lt;/span&gt;: z2 must greater than z1&lt;/pre&gt;
 &lt;/div&gt;&lt;/pre&gt;
 &lt;/div&gt;
 &lt;/div&gt;
@@ -18166,7 +18573,7 @@ Units of the gravitational constants in astropy: m3 / (kg s2)
 
 &lt;div class="output_area"&gt;&lt;div class="prompt"&gt;&lt;/div&gt;
 &lt;div class="output_subarea output_stream output_stdout output_text"&gt;
-&lt;pre class="ipynb"&gt;&amp;apos;m4 solMass / (kg3 s2)&amp;apos; and &amp;apos;N&amp;apos; (force) are not convertible
+&lt;pre class="ipynb"&gt;&amp;#39;m4 solMass / (kg3 s2)&amp;#39; and &amp;#39;N&amp;#39; (force) are not convertible
 &lt;/pre&gt;
 &lt;/div&gt;
 &lt;/div&gt;
