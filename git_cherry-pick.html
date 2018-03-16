@@ -4,7 +4,7 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>Random Thoughts in a Random Universe - Authors</title>
+  <title>How I use git cherry-pick</title>
   <meta name="author" content="Jörg Dietrich">
 
   <link href="/feeds/atom.xml" type="application/atom+xml" rel="alternate"
@@ -11853,17 +11853,1268 @@ jQuery(document).ready(function($) {
 -->
 
 <ul class="main-navigation">
-    <li >
+    <li class="active">
     <a href="http://joergdietrich.github.io/category/blog.html">Blog</a>
     </li>
     <li><a href="http://www.usm.lmu.de/people/dietrich/">Home Page</a></li>
 </ul></nav>
   <div id="main">
     <div id="content">
-    <h1>Authors on Random Thoughts in a Random Universe</h1>
+<div>
+  <article class="hentry" role="article">
+<header>
+      <h1 class="entry-title">How I use git cherry-pick</h1>
+      <p class="meta"><time datetime="2018-03-17T00:00:00+01:00" pubdate>Sat 17 March 2018</time></p>
+</header>
 
-    <ul>        <li><a href="http://joergdietrich.github.io/author/jorg-dietrich.html">Jörg Dietrich</a> (9)</li>
-    </ul>
+  <div class="entry-content"><p>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>We have a very nice series of informal computing centric talks/seminars at the University Observatory Munich, labelled &#8220;Code Coffee&#8221;. I enjoy these a lot, although I prefer tea. Even for topics on which I already know a lot, I usually learn something new and interesting. The most recent installment was an introduction to <code>git</code>. Although by no means an expert, I was probably one of the more advanced users in the room. One question, whether and how I use <code>git cherry-pick</code> led to a &#8212; I believe &#8212; somewhat convoluted answer and got me thinking that this should probably be the &#8220;comeback&#8221; blog post after a longer absence. Basic familiarity with <code>git add</code>, <code>git commit</code>, <code>git merge</code>, and how to identify a commit by its hash is assumed&nbsp;throughout.</p>
+<p>To see how I use <code>git cherry-pick</code> to quickly backport important changes like critical bug fixed from development branches, we will create a new, initially buggy, project. As a toy project, let&#8217;s create a Python module, which computes the $n$-th Fibonacci number. We will start by creating a new directory for our project and initializing&nbsp;git.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[1]:</div>
+
+<div class="inner_cell">
+    <div class="input_area">
+        <div class=" highlight hl-ipython3"><pre><span></span><span class="o">%</span><span class="k">mkdir</span> fibonacci
+<span class="o">%</span><span class="k">cd</span> fibonacci
+<span class="o">!</span>git init
+</pre></div>
+
+    </div>
+</div>
+
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+<div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre class="ipynb">/home/joerg/IPyNB/Blog/fibonacci
+Initialized empty Git repository in /home/joerg/IPyNB/Blog/fibonacci/.git/
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>We are now in the new project directory and can start adding&nbsp;code.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[2]:</div>
+
+<div class="inner_cell">
+    <div class="input_area">
+        <div class=" highlight hl-ipython3"><pre><span></span><span class="o">%%</span><span class="k">writefile</span> -a fibonacci.py
+
+import sys
+def fibonacci(n):
+    &quot;&quot;&quot;Computes the n-th Fibonacci by recursion&quot;&quot;&quot;
+    if n in [0, 1]:
+        return 1
+    else:
+        return fibonacci(n - 1) + fibonacci(n - 2)
+    
+if __name__ == &quot;__main__&quot;:
+    print(fibonacci(int(sys.argv[1])))
+</pre></div>
+
+    </div>
+</div>
+
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+<div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre class="ipynb">Writing fibonacci.py
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[3]:</div>
+
+<div class="inner_cell">
+    <div class="input_area">
+        <div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">fibonacci</span> <span class="k">import</span> <span class="n">fibonacci</span>
+
+<span class="p">[</span><span class="n">fibonacci</span><span class="p">(</span><span class="n">n</span><span class="p">)</span> <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">15</span><span class="p">)]</span>
+</pre></div>
+
+    </div>
+</div>
+
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+<div class="prompt output_prompt">Out[3]:</div>
+
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre class="ipynb">[3, 5, 8, 13, 21, 34, 55, 89, 144, 233, 377, 610]</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>This seems to work. Each number in this list ist the sum of its two predecessors. So let&#8217;s commit our first&nbsp;version.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[4]:</div>
+
+<div class="inner_cell">
+    <div class="input_area">
+        <div class=" highlight hl-ipython3"><pre><span></span>%%bash
+git add fibonacci.py
+git commit -m <span class="s2">&quot;First version of recursive Fibonacci sequence&quot;</span> fibonacci.py
+</pre></div>
+
+    </div>
+</div>
+
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+<div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre class="ipynb">[master (root-commit) b90d77e] First version of recursive Fibonacci sequence
+ 1 file changed, 11 insertions(+)
+ create mode 100644 fibonacci.py
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>A little further testing, however, shows that this becomes terribly slow for only slightly smaller number than we tested&nbsp;above.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[5]:</div>
+
+<div class="inner_cell">
+    <div class="input_area">
+        <div class=" highlight hl-ipython3"><pre><span></span><span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">31</span><span class="p">,</span> <span class="mi">36</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;Execution time fibonacci(</span><span class="si">{n}</span><span class="s1">)&#39;</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s1">&#39;: &#39;</span><span class="p">)</span>
+    <span class="o">%</span><span class="k">time</span> fibonacci(n)
+</pre></div>
+
+    </div>
+</div>
+
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+<div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre class="ipynb">Execution time fibonacci(31): CPU times: user 512 ms, sys: 3.79 ms, total: 516 ms
+Wall time: 515 ms
+Execution time fibonacci(32): CPU times: user 831 ms, sys: 158 µs, total: 831 ms
+Wall time: 831 ms
+Execution time fibonacci(33): CPU times: user 1.63 s, sys: 4.11 ms, total: 1.64 s
+Wall time: 1.64 s
+Execution time fibonacci(34): CPU times: user 2.17 s, sys: 160 µs, total: 2.17 s
+Wall time: 2.17 s
+Execution time fibonacci(35): CPU times: user 3.48 s, sys: 20 µs, total: 3.48 s
+Wall time: 3.48 s
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>And what&#8217;s worse: The execution time of <code>fibonacci(n)</code> is the sum of the execution times of <code>fibonacci(n-1)</code> and <code>fibonacci(n-2)</code>. At this rate, <code>fibonacci(100)</code> will finish in roughly 4 million years! Clearly, something must be done about this. So, we create a new development branch to deal with this&nbsp;problem.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[6]:</div>
+
+<div class="inner_cell">
+    <div class="input_area">
+        <div class=" highlight hl-ipython3"><pre><span></span>%%bash
+git checkout -b make_faster
+</pre></div>
+
+    </div>
+</div>
+
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+<div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stderr output_text">
+<pre class="ipynb">Switched to a new branch &#39;make_faster&#39;
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>First, our developer, apparently unaware of the goodnes that is jupyter notebooks and the ipython %time and %timeit magics, creates their own time measurement, to see how they are&nbsp;doing.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[7]:</div>
+
+<div class="inner_cell">
+    <div class="input_area">
+        <div class=" highlight hl-ipython3"><pre><span></span><span class="o">%%</span><span class="k">writefile</span> fibonacci.py
+
+import sys
+import time
+
+def fibonacci(n):
+    &quot;&quot;&quot;Computes the n-th Fibonacci by recursion&quot;&quot;&quot;
+    if n in [0, 1]:
+        return 1
+    else:
+        return fibonacci(n - 1) + fibonacci(n - 2)
+    
+if __name__ == &quot;__main__&quot;:
+    t0 = time.time()
+    print(fibonacci(int(sys.argv[1])))
+    duration = time.time() - t0
+    print(f&#39;Executed in {duration:.2} seconds&#39;)
+</pre></div>
+
+    </div>
+</div>
+
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+<div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre class="ipynb">Overwriting fibonacci.py
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[8]:</div>
+
+<div class="inner_cell">
+    <div class="input_area">
+        <div class=" highlight hl-ipython3"><pre><span></span><span class="o">!</span>python ./fibonacci.py <span class="m">35</span>
+</pre></div>
+
+    </div>
+</div>
+
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+<div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre class="ipynb">14930352
+Executed in 3.7 seconds
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>That&#8217;s apparently working. So lets commit&nbsp;this.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[9]:</div>
+
+<div class="inner_cell">
+    <div class="input_area">
+        <div class=" highlight hl-ipython3"><pre><span></span>%%bash
+git commit -m <span class="s1">&#39;add debugging timer&#39;</span> fibonacci.py
+</pre></div>
+
+    </div>
+</div>
+
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+<div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre class="ipynb">[make_faster 7a418cd] add debugging timer
+ 1 file changed, 6 insertions(+), 1 deletion(-)
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Meanwhile somebody notices that nothing in <code>fibonacci</code> ensures that <code>n</code> actually is an integer and makes a quick commit directly to master (not usually encouraged!) to rectify&nbsp;this.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[10]:</div>
+
+<div class="inner_cell">
+    <div class="input_area">
+        <div class=" highlight hl-ipython3"><pre><span></span><span class="o">!</span>git checkout master
+</pre></div>
+
+    </div>
+</div>
+
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+<div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre class="ipynb">Switched to branch &#39;master&#39;
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[11]:</div>
+
+<div class="inner_cell">
+    <div class="input_area">
+        <div class=" highlight hl-ipython3"><pre><span></span><span class="o">%%</span><span class="k">writefile</span> fibonacci.py
+
+import sys
+def fibonacci(n):
+    &quot;&quot;&quot;Computes the n-th Fibonacci by recursion&quot;&quot;&quot;
+    n = int(n)
+    if n in [0, 1]:
+        return 1
+    else:
+        return fibonacci(n - 1) + fibonacci(n - 2)
+    
+if __name__ == &quot;__main__&quot;:
+    print(fibonacci(int(sys.argv[1])))
+</pre></div>
+
+    </div>
+</div>
+
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+<div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre class="ipynb">Overwriting fibonacci.py
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[12]:</div>
+
+<div class="inner_cell">
+    <div class="input_area">
+        <div class=" highlight hl-ipython3"><pre><span></span>%%bash
+git commit -m <span class="s2">&quot;ensure that n is an integer or cast to int&quot;</span> fibonacci.py
+git log --all --graph
+</pre></div>
+
+    </div>
+</div>
+
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+<div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre class="ipynb">[master cfd121c] ensure that n is an integer or cast to int
+ 1 file changed, 1 insertion(+)
+* commit cfd121c94a0d96a73aad4fae30b646fb176e7398
+| Author: Jörg Dietrich &lt;astro@joergdietrich.com&gt;
+| Date:   Sat Mar 17 00:05:34 2018 +0100
+| 
+|     ensure that n is an integer or cast to int
+|    
+| * commit 7a418cdc3dc2effa01829ab3c45dab3f0777a35b
+|/  Author: Jörg Dietrich &lt;astro@joergdietrich.com&gt;
+|   Date:   Sat Mar 17 00:05:19 2018 +0100
+|   
+|       add debugging timer
+|  
+* commit b90d77e2d9fd1a0e5e1f8383751ca6a208264e6c
+  Author: Jörg Dietrich &lt;astro@joergdietrich.com&gt;
+  Date:   Sat Mar 17 00:04:49 2018 +0100
+  
+      First version of recursive Fibonacci sequence
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Okay, we have two branches (<code>master</code> and <code>make_faster</code>), which both have commits not present in the other&nbsp;one.</p>
+<p>Time to get back to development and trying to make our program faster where our developer notices a serious&nbsp;problem:</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[13]:</div>
+
+<div class="inner_cell">
+    <div class="input_area">
+        <div class=" highlight hl-ipython3"><pre><span></span>%%bash
+git checkout make_faster
+<span class="k">for</span> i in <span class="sb">`</span>seq <span class="m">0</span> <span class="m">5</span><span class="sb">`</span><span class="p">;</span> <span class="k">do</span> <span class="nb">echo</span> -n <span class="s2">&quot;</span><span class="nv">$i</span><span class="s2"> &quot;</span><span class="p">;</span> python ./fibonacci.py <span class="nv">$i</span><span class="p">;</span> <span class="k">done</span>
+</pre></div>
+
+    </div>
+</div>
+
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+<div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre class="ipynb">0 1
+Executed in 4.4e-05 seconds
+1 1
+Executed in 2.3e-05 seconds
+2 2
+Executed in 2e-05 seconds
+3 3
+Executed in 1.7e-05 seconds
+4 5
+Executed in 1.9e-05 seconds
+5 8
+Executed in 2.3e-05 seconds
+</pre>
+</div>
+</div>
+
+<div class="output_area">
+
+<div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stderr output_text">
+<pre class="ipynb">Switched to branch &#39;make_faster&#39;
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Our Fibonacci series is off by one! <code>fibonacci(0)</code> should be 0, and <code>fibonacci(4)</code> should be 3, while <code>fibonacci(5)</code> should 5. Let&#8217;s fix this&nbsp;first.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[14]:</div>
+
+<div class="inner_cell">
+    <div class="input_area">
+        <div class=" highlight hl-ipython3"><pre><span></span><span class="o">%%</span><span class="k">writefile</span> fibonacci.py
+
+import sys
+import time
+
+def fibonacci(n):
+    &quot;&quot;&quot;Computes the n-th Fibonacci by recursion&quot;&quot;&quot;
+    if n in [0, 1]:
+        return n  # Return n, not 1!
+    else:
+        return fibonacci(n - 1) + fibonacci(n - 2)
+    
+if __name__ == &quot;__main__&quot;:
+    t0 = time.time()
+    print(fibonacci(int(sys.argv[1])))
+    duration = time.time() - t0
+    print(f&#39;Executed in {duration:.2} seconds&#39;)
+</pre></div>
+
+    </div>
+</div>
+
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+<div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre class="ipynb">Overwriting fibonacci.py
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[15]:</div>
+
+<div class="inner_cell">
+    <div class="input_area">
+        <div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Let&#39;s make some simple test. These should really be automated unit tests …</span>
+<span class="k">assert</span> <span class="n">fibonacci</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span> <span class="o">==</span> <span class="mi">5</span>
+<span class="k">assert</span> <span class="n">fibonacci</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span>
+<span class="k">assert</span> <span class="n">fibonacci</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span> <span class="o">==</span> <span class="mi">55</span>
+</pre></div>
+
+    </div>
+</div>
+
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[16]:</div>
+
+<div class="inner_cell">
+    <div class="input_area">
+        <div class=" highlight hl-ipython3"><pre><span></span><span class="o">!</span>git commit -m <span class="s2">&quot;fix obiwan bug in fibonacci&quot;</span> fibonacci.py
+</pre></div>
+
+    </div>
+</div>
+
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+<div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre class="ipynb">[make_faster 33e0161] fix obiwan bug in fibonacci
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Phew, this fix is important enough that it should go directly into our production code in master. This time, however, we&#8217;ll follow the good (best?!) practice of not committing to master directly but create a bug fix branch. This could then be reviewed before being merged into master. We don&#8217;t want to merge the <code>make_faster</code> branch into <code>master</code>, because our developer is experimenting and has littered it with debugging code, and god know&#8217;s what he&#8217;s been trying&nbsp;there.</p>
+<p>We make a note of the bug fix (short) commit hash (<code>33e0161</code>) now, but could of course retrieve this later from <code>git log</code> as well. This is the one we will cherry-pick into our bug fix&nbsp;branch.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[17]:</div>
+
+<div class="inner_cell">
+    <div class="input_area">
+        <div class=" highlight hl-ipython3"><pre><span></span>%%bash
+<span class="c1"># We want to fix master, so we&#39;ll branch from there</span>
+git checkout master
+git checkout -b fix_obiwan
+git cherry-pick 33e0161
+</pre></div>
+
+    </div>
+</div>
+
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+<div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre class="ipynb">[fix_obiwan dbff8eb] fix obiwan bug in fibonacci
+ Date: Sat Mar 17 00:06:02 2018 +0100
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+</pre>
+</div>
+</div>
+
+<div class="output_area">
+
+<div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stderr output_text">
+<pre class="ipynb">Switched to branch &#39;master&#39;
+Switched to a new branch &#39;fix_obiwan&#39;
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>And then, after code review, etc. this bug fix branch is merged into&nbsp;master.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[18]:</div>
+
+<div class="inner_cell">
+    <div class="input_area">
+        <div class=" highlight hl-ipython3"><pre><span></span>%%bash
+git checkout master
+git merge fix_obiwan
+</pre></div>
+
+    </div>
+</div>
+
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+<div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre class="ipynb">Updating cfd121c..dbff8eb
+Fast-forward
+ fibonacci.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+</pre>
+</div>
+</div>
+
+<div class="output_area">
+
+<div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stderr output_text">
+<pre class="ipynb">Switched to branch &#39;master&#39;
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Meanwhile our developer has an epiphany. Every time the recursion calls <code>fibonacci(n - 2)</code> it computes the same values that the previous call to <code>fibonacci(n - 1)</code> already computed. If only there was a way to cache the results of previous function calls … Well, this being Python, of course there&nbsp;is.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[19]:</div>
+
+<div class="inner_cell">
+    <div class="input_area">
+        <div class=" highlight hl-ipython3"><pre><span></span><span class="o">!</span>git checkout make_faster
+</pre></div>
+
+    </div>
+</div>
+
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+<div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre class="ipynb">Switched to branch &#39;make_faster&#39;
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[20]:</div>
+
+<div class="inner_cell">
+    <div class="input_area">
+        <div class=" highlight hl-ipython3"><pre><span></span><span class="o">%%</span><span class="k">writefile</span> fibonacci.py
+
+from functools import lru_cache
+import sys
+import time
+
+
+@lru_cache()
+def fibonacci(n):
+    &quot;&quot;&quot;Computes the n-th Fibonacci by recursion&quot;&quot;&quot;
+    if n in [0, 1]:
+        return n  # Return n, not 1!
+    else:
+        return fibonacci(n - 1) + fibonacci(n - 2)
+    
+if __name__ == &quot;__main__&quot;:
+    t0 = time.time()
+    print(fibonacci(int(sys.argv[1])))
+    duration = time.time() - t0
+    print(f&#39;Executed in {duration:.2} seconds&#39;)
+</pre></div>
+
+    </div>
+</div>
+
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+<div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre class="ipynb">Overwriting fibonacci.py
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[21]:</div>
+
+<div class="inner_cell">
+    <div class="input_area">
+        <div class=" highlight hl-ipython3"><pre><span></span><span class="o">!</span>python ./fibonacci.py <span class="m">100</span>
+</pre></div>
+
+    </div>
+</div>
+
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+<div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre class="ipynb">354224848179261915075
+Executed in 0.00012 seconds
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Whoah, that&#8217;s a lot faster than 4 Myr! Let&#8217;s commit this and then clean&nbsp;up.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[22]:</div>
+
+<div class="inner_cell">
+    <div class="input_area">
+        <div class=" highlight hl-ipython3"><pre><span></span><span class="o">!</span>git commit -m <span class="s2">&quot;speed up by using least-recently used cache decorator&quot;</span> fibonacci.py
+</pre></div>
+
+    </div>
+</div>
+
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+<div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre class="ipynb">[make_faster abf1332] speed up by using least-recently used cache decorator
+ 1 file changed, 3 insertions(+)
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[23]:</div>
+
+<div class="inner_cell">
+    <div class="input_area">
+        <div class=" highlight hl-ipython3"><pre><span></span><span class="o">%%</span><span class="k">writefile</span> fibonacci.py
+
+from functools import lru_cache
+import sys
+
+@lru_cache()
+def fibonacci(n):
+    &quot;&quot;&quot;Computes the n-th Fibonacci by recursion&quot;&quot;&quot;
+    if n in [0, 1]:
+        return n  # Return n, not 1!
+    else:
+        return fibonacci(n - 1) + fibonacci(n - 2)
+    
+if __name__ == &quot;__main__&quot;:
+    print(fibonacci(int(sys.argv[1])))
+</pre></div>
+
+    </div>
+</div>
+
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+<div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre class="ipynb">Overwriting fibonacci.py
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[24]:</div>
+
+<div class="inner_cell">
+    <div class="input_area">
+        <div class=" highlight hl-ipython3"><pre><span></span>%%bash
+git commit -m <span class="s2">&quot;remove debugging statements&quot;</span> fibonacci.py
+git checkout master
+git merge make_faster
+</pre></div>
+
+    </div>
+</div>
+
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+<div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre class="ipynb">[make_faster 6d8d63f] remove debugging statements
+ 1 file changed, 1 insertion(+), 6 deletions(-)
+Auto-merging fibonacci.py
+Merge made by the &#39;recursive&#39; strategy.
+ fibonacci.py | 3 +++
+ 1 file changed, 3 insertions(+)
+</pre>
+</div>
+</div>
+
+<div class="output_area">
+
+<div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stderr output_text">
+<pre class="ipynb">Switched to branch &#39;master&#39;
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[25]:</div>
+
+<div class="inner_cell">
+    <div class="input_area">
+        <div class=" highlight hl-ipython3"><pre><span></span><span class="o">!</span>git log --all --graph
+</pre></div>
+
+    </div>
+</div>
+
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+<div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre class="ipynb">*   <span class="ansi-yellow-fg">commit 06f69272a3289715bae44ba8bc00701dc13c84f6</span>
+<span class="ansi-red-fg">|</span><span class="ansi-green-fg">\</span>  Merge: dbff8eb 6d8d63f
+<span class="ansi-red-fg">|</span> <span class="ansi-green-fg">|</span> Author: Jörg Dietrich &lt;astro@joergdietrich.com&gt;
+<span class="ansi-red-fg">|</span> <span class="ansi-green-fg">|</span> Date:   Sat Mar 17 00:06:43 2018 +0100
+<span class="ansi-red-fg">|</span> <span class="ansi-green-fg">|</span> 
+<span class="ansi-red-fg">|</span> <span class="ansi-green-fg">|</span>     Merge branch &#39;make_faster&#39;
+<span class="ansi-red-fg">|</span> <span class="ansi-green-fg">|</span>   
+<span class="ansi-red-fg">|</span> * <span class="ansi-yellow-fg">commit 6d8d63f612ae1b087f1449b24d7b50de3665b280</span>
+<span class="ansi-red-fg">|</span> <span class="ansi-green-fg">|</span> Author: Jörg Dietrich &lt;astro@joergdietrich.com&gt;
+<span class="ansi-red-fg">|</span> <span class="ansi-green-fg">|</span> Date:   Sat Mar 17 00:06:43 2018 +0100
+<span class="ansi-red-fg">|</span> <span class="ansi-green-fg">|</span> 
+<span class="ansi-red-fg">|</span> <span class="ansi-green-fg">|</span>     remove debugging statements
+<span class="ansi-red-fg">|</span> <span class="ansi-green-fg">|</span>   
+<span class="ansi-red-fg">|</span> * <span class="ansi-yellow-fg">commit abf13323a213d94dd4fe0c095e9d4a50335dd253</span>
+<span class="ansi-red-fg">|</span> <span class="ansi-green-fg">|</span> Author: Jörg Dietrich &lt;astro@joergdietrich.com&gt;
+<span class="ansi-red-fg">|</span> <span class="ansi-green-fg">|</span> Date:   Sat Mar 17 00:06:37 2018 +0100
+<span class="ansi-red-fg">|</span> <span class="ansi-green-fg">|</span> 
+<span class="ansi-red-fg">|</span> <span class="ansi-green-fg">|</span>     speed up by using least-recently used cache decorator
+<span class="ansi-red-fg">|</span> <span class="ansi-green-fg">|</span>   
+<span class="ansi-red-fg">|</span> * <span class="ansi-yellow-fg">commit 33e016177dd7c3805767decd4f6d45b58bded942</span>
+<span class="ansi-red-fg">|</span> <span class="ansi-green-fg">|</span> Author: Jörg Dietrich &lt;astro@joergdietrich.com&gt;
+<span class="ansi-red-fg">|</span> <span class="ansi-green-fg">|</span> Date:   Sat Mar 17 00:06:02 2018 +0100
+<span class="ansi-red-fg">|</span> <span class="ansi-green-fg">|</span> 
+<span class="ansi-red-fg">|</span> <span class="ansi-green-fg">|</span>     fix obiwan bug in fibonacci
+<span class="ansi-red-fg">|</span> <span class="ansi-green-fg">|</span>   
+<span class="ansi-red-fg">|</span> * <span class="ansi-yellow-fg">commit 7a418cdc3dc2effa01829ab3c45dab3f0777a35b</span>
+<span class="ansi-red-fg">|</span> <span class="ansi-green-fg">|</span> Author: Jörg Dietrich &lt;astro@joergdietrich.com&gt;
+<span class="ansi-red-fg">|</span> <span class="ansi-green-fg">|</span> Date:   Sat Mar 17 00:05:19 2018 +0100
+<span class="ansi-red-fg">|</span> <span class="ansi-green-fg">|</span> 
+<span class="ansi-red-fg">|</span> <span class="ansi-green-fg">|</span>     add debugging timer
+<span class="ansi-red-fg">|</span> <span class="ansi-green-fg">|</span>   
+* <span class="ansi-green-fg">|</span> <span class="ansi-yellow-fg">commit dbff8eba5b33067c6a9dbe468c46f71b742fce6a</span>
+<span class="ansi-green-fg">|</span> <span class="ansi-green-fg">|</span> Author: Jörg Dietrich &lt;astro@joergdietrich.com&gt;
+<span class="ansi-green-fg">|</span> <span class="ansi-green-fg">|</span> Date:   Sat Mar 17 00:06:02 2018 +0100
+<span class="ansi-green-fg">|</span> <span class="ansi-green-fg">|</span> 
+<span class="ansi-green-fg">|</span> <span class="ansi-green-fg">|</span>     fix obiwan bug in fibonacci
+<span class="ansi-green-fg">|</span> <span class="ansi-green-fg">|</span>   
+* <span class="ansi-green-fg">|</span> <span class="ansi-yellow-fg">commit cfd121c94a0d96a73aad4fae30b646fb176e7398</span>
+<span class="ansi-green-fg">|</span><span class="ansi-green-fg">/</span>  Author: Jörg Dietrich &lt;astro@joergdietrich.com&gt;
+<span class="ansi-green-fg">|</span>   Date:   Sat Mar 17 00:05:34 2018 +0100
+<span class="ansi-green-fg">|</span>   
+<span class="ansi-green-fg">|</span>       ensure that n is an integer or cast to int
+<span class="ansi-green-fg">|</span>  
+* <span class="ansi-yellow-fg">commit b90d77e2d9fd1a0e5e1f8383751ca6a208264e6c</span>
+  Author: Jörg Dietrich &lt;astro@joergdietrich.com&gt;
+  Date:   Sat Mar 17 00:04:49 2018 +0100
+  
+      First version of recursive Fibonacci sequence
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Great, we merged everything back into one branch! There cherry-picked bug fix, which was modification in both branches did not cause a merge&nbsp;conflict.</p>
+<p>In summary, <code>git cherry-pick</code> is a convenient way to quickly backport important bug fixes from development branches to more slowly moving branches, such as stable&nbsp;releases.</p>
+<p>And finally, there&#8217;s of course no need to compute the Fibonacci sequence with recursion. One could as well do this&nbsp;iteratively.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p><small>
+<a rel=\"license\" href=\"http://creativecommons.org/licenses/by-sa/4.0/\">This blog 
+post is licensed under a <a rel=\"license\" href=\"http://creativecommons.org/licenses/by-
+sa/4.0/\">Creative Commons Attribution-ShareAlike 4.0 International License</a>. This post
+ was written as a <a href=\"http://www.jupyter.org/\">Jupyter Notebook</a> in Python. You 
+can <a href=\"https://raw.githubusercontent.com/joergdietrich/joergdietrich.github.io/mast
+er/notebooks/git_cherry-pick.ipynb\">download</a> the original notebook.</small></p>
+
+</div>
+</div>
+</div>
+ 
+
+</p></div>
+    <footer>
+<p class="meta">
+  <span class="byline author vcard">
+    Posted by <span class="fn">Jörg Dietrich</span>
+  </span>
+<time datetime="2018-03-17T00:00:00+01:00" pubdate>Sat 17 March 2018</time>  <span class="categories">
+    <a class="category" href="http://joergdietrich.github.io/tag/git.html">git</a>
+    <a class="category" href="http://joergdietrich.github.io/tag/version-control.html">version control</a>
+  </span>
+</p><div class="sharing">
+</div>    </footer>
+  </article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript></div>
+  </section>
+</div>
 <aside class="sidebar">
   <section>
     <h1>Recent Posts</h1>
@@ -11958,6 +13209,9 @@ jQuery(document).ready(function($) {
 </script>
 	<script type="text/javascript">
 	  var disqus_shortname = 'randomuniverse';
+          var disqus_identifier = '/git_cherry-pick.html';
+          var disqus_url = 'http://joergdietrich.github.io/git_cherry-pick.html';
+          var disqus_title = 'How I use git&nbsp;cherry-pick';
 	  (function() {
 	    var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
 	    dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';

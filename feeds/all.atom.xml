@@ -1,7 +1,1245 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Random Thoughts in a Random Universe</title><link href="http://joergdietrich.github.io/" rel="alternate"></link><link href="/feeds/all.atom.xml" rel="self"></link><id>http://joergdietrich.github.io/</id><updated>2017-01-26T00:00:00+01:00</updated><entry><title>Using matplotlib to plot over existing Figures</title><link href="http://joergdietrich.github.io/matplotlib-overplot.html" rel="alternate"></link><updated>2017-01-26T00:00:00+01:00</updated><author><name>Jörg Dietrich</name></author><id>tag:joergdietrich.github.io,2017-01-26:matplotlib-overplot.html</id><summary type="html">&lt;p&gt;
-&lt;div class="cell border-box-sizing text_cell rendered"&gt;
-&lt;div class="prompt input_prompt"&gt;
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Random Thoughts in a Random Universe</title><link href="http://joergdietrich.github.io/" rel="alternate"></link><link href="/feeds/all.atom.xml" rel="self"></link><id>http://joergdietrich.github.io/</id><updated>2018-03-17T00:00:00+01:00</updated><entry><title>How I use git cherry-pick</title><link href="http://joergdietrich.github.io/git_cherry-pick.html" rel="alternate"></link><published>2018-03-17T00:00:00+01:00</published><updated>2018-03-17T00:00:00+01:00</updated><author><name>Jörg Dietrich</name></author><id>tag:joergdietrich.github.io,2018-03-17:/git_cherry-pick.html</id><summary type="html">&lt;p&gt;
+&lt;div class="cell border-box-sizing text_cell rendered"&gt;&lt;div class="prompt input_prompt"&gt;
+&lt;/div&gt;
+&lt;div class="inner_cell"&gt;
+&lt;div class="text_cell_render border-box-sizing rendered_html"&gt;
+&lt;p&gt;We have a very nice series of informal computing centric talks/seminars at the University Observatory Munich, labelled &amp;#8220;Code Coffee&amp;#8221;. I enjoy these a lot, although I prefer tea. Even for topics on which I already know a lot, I usually learn something new and interesting. The most recent installment …&lt;/p&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;/p&gt;</summary><content type="html">&lt;p&gt;
+&lt;div class="cell border-box-sizing text_cell rendered"&gt;&lt;div class="prompt input_prompt"&gt;
+&lt;/div&gt;
+&lt;div class="inner_cell"&gt;
+&lt;div class="text_cell_render border-box-sizing rendered_html"&gt;
+&lt;p&gt;We have a very nice series of informal computing centric talks/seminars at the University Observatory Munich, labelled &amp;#8220;Code Coffee&amp;#8221;. I enjoy these a lot, although I prefer tea. Even for topics on which I already know a lot, I usually learn something new and interesting. The most recent installment was an introduction to &lt;code&gt;git&lt;/code&gt;. Although by no means an expert, I was probably one of the more advanced users in the room. One question, whether and how I use &lt;code&gt;git cherry-pick&lt;/code&gt; led to a &amp;#8212; I believe &amp;#8212; somewhat convoluted answer and got me thinking that this should probably be the &amp;#8220;comeback&amp;#8221; blog post after a longer absence. Basic familiarity with &lt;code&gt;git add&lt;/code&gt;, &lt;code&gt;git commit&lt;/code&gt;, &lt;code&gt;git merge&lt;/code&gt;, and how to identify a commit by its hash is assumed&amp;nbsp;throughout.&lt;/p&gt;
+&lt;p&gt;To see how I use &lt;code&gt;git cherry-pick&lt;/code&gt; to quickly backport important changes like critical bug fixed from development branches, we will create a new, initially buggy, project. As a toy project, let&amp;#8217;s create a Python module, which computes the $n$-th Fibonacci number. We will start by creating a new directory for our project and initializing&amp;nbsp;git.&lt;/p&gt;
+
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="cell border-box-sizing code_cell rendered"&gt;
+&lt;div class="input"&gt;
+&lt;div class="prompt input_prompt"&gt;In&amp;nbsp;[1]:&lt;/div&gt;
+
+&lt;div class="inner_cell"&gt;
+    &lt;div class="input_area"&gt;
+        &lt;div class=" highlight hl-ipython3"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="o"&gt;%&lt;/span&gt;&lt;span class="k"&gt;mkdir&lt;/span&gt; fibonacci
+&lt;span class="o"&gt;%&lt;/span&gt;&lt;span class="k"&gt;cd&lt;/span&gt; fibonacci
+&lt;span class="o"&gt;!&lt;/span&gt;git init
+&lt;/pre&gt;&lt;/div&gt;
+
+    &lt;/div&gt;
+&lt;/div&gt;
+
+&lt;/div&gt;
+
+&lt;div class="output_wrapper"&gt;
+&lt;div class="output"&gt;
+
+
+&lt;div class="output_area"&gt;
+
+&lt;div class="prompt"&gt;&lt;/div&gt;
+
+
+&lt;div class="output_subarea output_stream output_stdout output_text"&gt;
+&lt;pre class="ipynb"&gt;/home/joerg/IPyNB/Blog/fibonacci
+Initialized empty Git repository in /home/joerg/IPyNB/Blog/fibonacci/.git/
+&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;/div&gt;
+&lt;div class="cell border-box-sizing text_cell rendered"&gt;&lt;div class="prompt input_prompt"&gt;
+&lt;/div&gt;
+&lt;div class="inner_cell"&gt;
+&lt;div class="text_cell_render border-box-sizing rendered_html"&gt;
+&lt;p&gt;We are now in the new project directory and can start adding&amp;nbsp;code.&lt;/p&gt;
+
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="cell border-box-sizing code_cell rendered"&gt;
+&lt;div class="input"&gt;
+&lt;div class="prompt input_prompt"&gt;In&amp;nbsp;[2]:&lt;/div&gt;
+
+&lt;div class="inner_cell"&gt;
+    &lt;div class="input_area"&gt;
+        &lt;div class=" highlight hl-ipython3"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="o"&gt;%%&lt;/span&gt;&lt;span class="k"&gt;writefile&lt;/span&gt; -a fibonacci.py
+
+import sys
+def fibonacci(n):
+    &amp;quot;&amp;quot;&amp;quot;Computes the n-th Fibonacci by recursion&amp;quot;&amp;quot;&amp;quot;
+    if n in [0, 1]:
+        return 1
+    else:
+        return fibonacci(n - 1) + fibonacci(n - 2)
+    
+if __name__ == &amp;quot;__main__&amp;quot;:
+    print(fibonacci(int(sys.argv[1])))
+&lt;/pre&gt;&lt;/div&gt;
+
+    &lt;/div&gt;
+&lt;/div&gt;
+
+&lt;/div&gt;
+
+&lt;div class="output_wrapper"&gt;
+&lt;div class="output"&gt;
+
+
+&lt;div class="output_area"&gt;
+
+&lt;div class="prompt"&gt;&lt;/div&gt;
+
+
+&lt;div class="output_subarea output_stream output_stdout output_text"&gt;
+&lt;pre class="ipynb"&gt;Writing fibonacci.py
+&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;/div&gt;
+&lt;div class="cell border-box-sizing code_cell rendered"&gt;
+&lt;div class="input"&gt;
+&lt;div class="prompt input_prompt"&gt;In&amp;nbsp;[3]:&lt;/div&gt;
+
+&lt;div class="inner_cell"&gt;
+    &lt;div class="input_area"&gt;
+        &lt;div class=" highlight hl-ipython3"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="kn"&gt;from&lt;/span&gt; &lt;span class="nn"&gt;fibonacci&lt;/span&gt; &lt;span class="k"&gt;import&lt;/span&gt; &lt;span class="n"&gt;fibonacci&lt;/span&gt;
+
+&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;fibonacci&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;n&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="k"&gt;for&lt;/span&gt; &lt;span class="n"&gt;n&lt;/span&gt; &lt;span class="ow"&gt;in&lt;/span&gt; &lt;span class="nb"&gt;range&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;3&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mi"&gt;15&lt;/span&gt;&lt;span class="p"&gt;)]&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+    &lt;/div&gt;
+&lt;/div&gt;
+
+&lt;/div&gt;
+
+&lt;div class="output_wrapper"&gt;
+&lt;div class="output"&gt;
+
+
+&lt;div class="output_area"&gt;
+
+&lt;div class="prompt output_prompt"&gt;Out[3]:&lt;/div&gt;
+
+
+
+
+&lt;div class="output_text output_subarea output_execute_result"&gt;
+&lt;pre class="ipynb"&gt;[3, 5, 8, 13, 21, 34, 55, 89, 144, 233, 377, 610]&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;/div&gt;
+
+&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;/div&gt;
+&lt;div class="cell border-box-sizing text_cell rendered"&gt;&lt;div class="prompt input_prompt"&gt;
+&lt;/div&gt;
+&lt;div class="inner_cell"&gt;
+&lt;div class="text_cell_render border-box-sizing rendered_html"&gt;
+&lt;p&gt;This seems to work. Each number in this list ist the sum of its two predecessors. So let&amp;#8217;s commit our first&amp;nbsp;version.&lt;/p&gt;
+
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="cell border-box-sizing code_cell rendered"&gt;
+&lt;div class="input"&gt;
+&lt;div class="prompt input_prompt"&gt;In&amp;nbsp;[4]:&lt;/div&gt;
+
+&lt;div class="inner_cell"&gt;
+    &lt;div class="input_area"&gt;
+        &lt;div class=" highlight hl-ipython3"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;%%bash
+git add fibonacci.py
+git commit -m &lt;span class="s2"&gt;&amp;quot;First version of recursive Fibonacci sequence&amp;quot;&lt;/span&gt; fibonacci.py
+&lt;/pre&gt;&lt;/div&gt;
+
+    &lt;/div&gt;
+&lt;/div&gt;
+
+&lt;/div&gt;
+
+&lt;div class="output_wrapper"&gt;
+&lt;div class="output"&gt;
+
+
+&lt;div class="output_area"&gt;
+
+&lt;div class="prompt"&gt;&lt;/div&gt;
+
+
+&lt;div class="output_subarea output_stream output_stdout output_text"&gt;
+&lt;pre class="ipynb"&gt;[master (root-commit) b90d77e] First version of recursive Fibonacci sequence
+ 1 file changed, 11 insertions(+)
+ create mode 100644 fibonacci.py
+&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;/div&gt;
+&lt;div class="cell border-box-sizing text_cell rendered"&gt;&lt;div class="prompt input_prompt"&gt;
+&lt;/div&gt;
+&lt;div class="inner_cell"&gt;
+&lt;div class="text_cell_render border-box-sizing rendered_html"&gt;
+&lt;p&gt;A little further testing, however, shows that this becomes terribly slow for only slightly smaller number than we tested&amp;nbsp;above.&lt;/p&gt;
+
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="cell border-box-sizing code_cell rendered"&gt;
+&lt;div class="input"&gt;
+&lt;div class="prompt input_prompt"&gt;In&amp;nbsp;[5]:&lt;/div&gt;
+
+&lt;div class="inner_cell"&gt;
+    &lt;div class="input_area"&gt;
+        &lt;div class=" highlight hl-ipython3"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="k"&gt;for&lt;/span&gt; &lt;span class="n"&gt;n&lt;/span&gt; &lt;span class="ow"&gt;in&lt;/span&gt; &lt;span class="nb"&gt;range&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;31&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mi"&gt;36&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+    &lt;span class="nb"&gt;print&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;f&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;Execution time fibonacci(&lt;/span&gt;&lt;span class="si"&gt;{n}&lt;/span&gt;&lt;span class="s1"&gt;)&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;end&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;: &amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+    &lt;span class="o"&gt;%&lt;/span&gt;&lt;span class="k"&gt;time&lt;/span&gt; fibonacci(n)
+&lt;/pre&gt;&lt;/div&gt;
+
+    &lt;/div&gt;
+&lt;/div&gt;
+
+&lt;/div&gt;
+
+&lt;div class="output_wrapper"&gt;
+&lt;div class="output"&gt;
+
+
+&lt;div class="output_area"&gt;
+
+&lt;div class="prompt"&gt;&lt;/div&gt;
+
+
+&lt;div class="output_subarea output_stream output_stdout output_text"&gt;
+&lt;pre class="ipynb"&gt;Execution time fibonacci(31): CPU times: user 512 ms, sys: 3.79 ms, total: 516 ms
+Wall time: 515 ms
+Execution time fibonacci(32): CPU times: user 831 ms, sys: 158 µs, total: 831 ms
+Wall time: 831 ms
+Execution time fibonacci(33): CPU times: user 1.63 s, sys: 4.11 ms, total: 1.64 s
+Wall time: 1.64 s
+Execution time fibonacci(34): CPU times: user 2.17 s, sys: 160 µs, total: 2.17 s
+Wall time: 2.17 s
+Execution time fibonacci(35): CPU times: user 3.48 s, sys: 20 µs, total: 3.48 s
+Wall time: 3.48 s
+&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;/div&gt;
+&lt;div class="cell border-box-sizing text_cell rendered"&gt;&lt;div class="prompt input_prompt"&gt;
+&lt;/div&gt;
+&lt;div class="inner_cell"&gt;
+&lt;div class="text_cell_render border-box-sizing rendered_html"&gt;
+&lt;p&gt;And what&amp;#8217;s worse: The execution time of &lt;code&gt;fibonacci(n)&lt;/code&gt; is the sum of the execution times of &lt;code&gt;fibonacci(n-1)&lt;/code&gt; and &lt;code&gt;fibonacci(n-2)&lt;/code&gt;. At this rate, &lt;code&gt;fibonacci(100)&lt;/code&gt; will finish in roughly 4 million years! Clearly, something must be done about this. So, we create a new development branch to deal with this&amp;nbsp;problem.&lt;/p&gt;
+
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="cell border-box-sizing code_cell rendered"&gt;
+&lt;div class="input"&gt;
+&lt;div class="prompt input_prompt"&gt;In&amp;nbsp;[6]:&lt;/div&gt;
+
+&lt;div class="inner_cell"&gt;
+    &lt;div class="input_area"&gt;
+        &lt;div class=" highlight hl-ipython3"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;%%bash
+git checkout -b make_faster
+&lt;/pre&gt;&lt;/div&gt;
+
+    &lt;/div&gt;
+&lt;/div&gt;
+
+&lt;/div&gt;
+
+&lt;div class="output_wrapper"&gt;
+&lt;div class="output"&gt;
+
+
+&lt;div class="output_area"&gt;
+
+&lt;div class="prompt"&gt;&lt;/div&gt;
+
+
+&lt;div class="output_subarea output_stream output_stderr output_text"&gt;
+&lt;pre class="ipynb"&gt;Switched to a new branch &amp;#39;make_faster&amp;#39;
+&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;/div&gt;
+&lt;div class="cell border-box-sizing text_cell rendered"&gt;&lt;div class="prompt input_prompt"&gt;
+&lt;/div&gt;
+&lt;div class="inner_cell"&gt;
+&lt;div class="text_cell_render border-box-sizing rendered_html"&gt;
+&lt;p&gt;First, our developer, apparently unaware of the goodnes that is jupyter notebooks and the ipython %time and %timeit magics, creates their own time measurement, to see how they are&amp;nbsp;doing.&lt;/p&gt;
+
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="cell border-box-sizing code_cell rendered"&gt;
+&lt;div class="input"&gt;
+&lt;div class="prompt input_prompt"&gt;In&amp;nbsp;[7]:&lt;/div&gt;
+
+&lt;div class="inner_cell"&gt;
+    &lt;div class="input_area"&gt;
+        &lt;div class=" highlight hl-ipython3"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="o"&gt;%%&lt;/span&gt;&lt;span class="k"&gt;writefile&lt;/span&gt; fibonacci.py
+
+import sys
+import time
+
+def fibonacci(n):
+    &amp;quot;&amp;quot;&amp;quot;Computes the n-th Fibonacci by recursion&amp;quot;&amp;quot;&amp;quot;
+    if n in [0, 1]:
+        return 1
+    else:
+        return fibonacci(n - 1) + fibonacci(n - 2)
+    
+if __name__ == &amp;quot;__main__&amp;quot;:
+    t0 = time.time()
+    print(fibonacci(int(sys.argv[1])))
+    duration = time.time() - t0
+    print(f&amp;#39;Executed in {duration:.2} seconds&amp;#39;)
+&lt;/pre&gt;&lt;/div&gt;
+
+    &lt;/div&gt;
+&lt;/div&gt;
+
+&lt;/div&gt;
+
+&lt;div class="output_wrapper"&gt;
+&lt;div class="output"&gt;
+
+
+&lt;div class="output_area"&gt;
+
+&lt;div class="prompt"&gt;&lt;/div&gt;
+
+
+&lt;div class="output_subarea output_stream output_stdout output_text"&gt;
+&lt;pre class="ipynb"&gt;Overwriting fibonacci.py
+&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;/div&gt;
+&lt;div class="cell border-box-sizing code_cell rendered"&gt;
+&lt;div class="input"&gt;
+&lt;div class="prompt input_prompt"&gt;In&amp;nbsp;[8]:&lt;/div&gt;
+
+&lt;div class="inner_cell"&gt;
+    &lt;div class="input_area"&gt;
+        &lt;div class=" highlight hl-ipython3"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="o"&gt;!&lt;/span&gt;python ./fibonacci.py &lt;span class="m"&gt;35&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+    &lt;/div&gt;
+&lt;/div&gt;
+
+&lt;/div&gt;
+
+&lt;div class="output_wrapper"&gt;
+&lt;div class="output"&gt;
+
+
+&lt;div class="output_area"&gt;
+
+&lt;div class="prompt"&gt;&lt;/div&gt;
+
+
+&lt;div class="output_subarea output_stream output_stdout output_text"&gt;
+&lt;pre class="ipynb"&gt;14930352
+Executed in 3.7 seconds
+&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;/div&gt;
+&lt;div class="cell border-box-sizing text_cell rendered"&gt;&lt;div class="prompt input_prompt"&gt;
+&lt;/div&gt;
+&lt;div class="inner_cell"&gt;
+&lt;div class="text_cell_render border-box-sizing rendered_html"&gt;
+&lt;p&gt;That&amp;#8217;s apparently working. So lets commit&amp;nbsp;this.&lt;/p&gt;
+
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="cell border-box-sizing code_cell rendered"&gt;
+&lt;div class="input"&gt;
+&lt;div class="prompt input_prompt"&gt;In&amp;nbsp;[9]:&lt;/div&gt;
+
+&lt;div class="inner_cell"&gt;
+    &lt;div class="input_area"&gt;
+        &lt;div class=" highlight hl-ipython3"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;%%bash
+git commit -m &lt;span class="s1"&gt;&amp;#39;add debugging timer&amp;#39;&lt;/span&gt; fibonacci.py
+&lt;/pre&gt;&lt;/div&gt;
+
+    &lt;/div&gt;
+&lt;/div&gt;
+
+&lt;/div&gt;
+
+&lt;div class="output_wrapper"&gt;
+&lt;div class="output"&gt;
+
+
+&lt;div class="output_area"&gt;
+
+&lt;div class="prompt"&gt;&lt;/div&gt;
+
+
+&lt;div class="output_subarea output_stream output_stdout output_text"&gt;
+&lt;pre class="ipynb"&gt;[make_faster 7a418cd] add debugging timer
+ 1 file changed, 6 insertions(+), 1 deletion(-)
+&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;/div&gt;
+&lt;div class="cell border-box-sizing text_cell rendered"&gt;&lt;div class="prompt input_prompt"&gt;
+&lt;/div&gt;
+&lt;div class="inner_cell"&gt;
+&lt;div class="text_cell_render border-box-sizing rendered_html"&gt;
+&lt;p&gt;Meanwhile somebody notices that nothing in &lt;code&gt;fibonacci&lt;/code&gt; ensures that &lt;code&gt;n&lt;/code&gt; actually is an integer and makes a quick commit directly to master (not usually encouraged!) to rectify&amp;nbsp;this.&lt;/p&gt;
+
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="cell border-box-sizing code_cell rendered"&gt;
+&lt;div class="input"&gt;
+&lt;div class="prompt input_prompt"&gt;In&amp;nbsp;[10]:&lt;/div&gt;
+
+&lt;div class="inner_cell"&gt;
+    &lt;div class="input_area"&gt;
+        &lt;div class=" highlight hl-ipython3"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="o"&gt;!&lt;/span&gt;git checkout master
+&lt;/pre&gt;&lt;/div&gt;
+
+    &lt;/div&gt;
+&lt;/div&gt;
+
+&lt;/div&gt;
+
+&lt;div class="output_wrapper"&gt;
+&lt;div class="output"&gt;
+
+
+&lt;div class="output_area"&gt;
+
+&lt;div class="prompt"&gt;&lt;/div&gt;
+
+
+&lt;div class="output_subarea output_stream output_stdout output_text"&gt;
+&lt;pre class="ipynb"&gt;Switched to branch &amp;#39;master&amp;#39;
+&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;/div&gt;
+&lt;div class="cell border-box-sizing code_cell rendered"&gt;
+&lt;div class="input"&gt;
+&lt;div class="prompt input_prompt"&gt;In&amp;nbsp;[11]:&lt;/div&gt;
+
+&lt;div class="inner_cell"&gt;
+    &lt;div class="input_area"&gt;
+        &lt;div class=" highlight hl-ipython3"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="o"&gt;%%&lt;/span&gt;&lt;span class="k"&gt;writefile&lt;/span&gt; fibonacci.py
+
+import sys
+def fibonacci(n):
+    &amp;quot;&amp;quot;&amp;quot;Computes the n-th Fibonacci by recursion&amp;quot;&amp;quot;&amp;quot;
+    n = int(n)
+    if n in [0, 1]:
+        return 1
+    else:
+        return fibonacci(n - 1) + fibonacci(n - 2)
+    
+if __name__ == &amp;quot;__main__&amp;quot;:
+    print(fibonacci(int(sys.argv[1])))
+&lt;/pre&gt;&lt;/div&gt;
+
+    &lt;/div&gt;
+&lt;/div&gt;
+
+&lt;/div&gt;
+
+&lt;div class="output_wrapper"&gt;
+&lt;div class="output"&gt;
+
+
+&lt;div class="output_area"&gt;
+
+&lt;div class="prompt"&gt;&lt;/div&gt;
+
+
+&lt;div class="output_subarea output_stream output_stdout output_text"&gt;
+&lt;pre class="ipynb"&gt;Overwriting fibonacci.py
+&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;/div&gt;
+&lt;div class="cell border-box-sizing code_cell rendered"&gt;
+&lt;div class="input"&gt;
+&lt;div class="prompt input_prompt"&gt;In&amp;nbsp;[12]:&lt;/div&gt;
+
+&lt;div class="inner_cell"&gt;
+    &lt;div class="input_area"&gt;
+        &lt;div class=" highlight hl-ipython3"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;%%bash
+git commit -m &lt;span class="s2"&gt;&amp;quot;ensure that n is an integer or cast to int&amp;quot;&lt;/span&gt; fibonacci.py
+git log --all --graph
+&lt;/pre&gt;&lt;/div&gt;
+
+    &lt;/div&gt;
+&lt;/div&gt;
+
+&lt;/div&gt;
+
+&lt;div class="output_wrapper"&gt;
+&lt;div class="output"&gt;
+
+
+&lt;div class="output_area"&gt;
+
+&lt;div class="prompt"&gt;&lt;/div&gt;
+
+
+&lt;div class="output_subarea output_stream output_stdout output_text"&gt;
+&lt;pre class="ipynb"&gt;[master cfd121c] ensure that n is an integer or cast to int
+ 1 file changed, 1 insertion(+)
+* commit cfd121c94a0d96a73aad4fae30b646fb176e7398
+| Author: Jörg Dietrich &amp;lt;astro@joergdietrich.com&amp;gt;
+| Date:   Sat Mar 17 00:05:34 2018 +0100
+| 
+|     ensure that n is an integer or cast to int
+|    
+| * commit 7a418cdc3dc2effa01829ab3c45dab3f0777a35b
+|/  Author: Jörg Dietrich &amp;lt;astro@joergdietrich.com&amp;gt;
+|   Date:   Sat Mar 17 00:05:19 2018 +0100
+|   
+|       add debugging timer
+|  
+* commit b90d77e2d9fd1a0e5e1f8383751ca6a208264e6c
+  Author: Jörg Dietrich &amp;lt;astro@joergdietrich.com&amp;gt;
+  Date:   Sat Mar 17 00:04:49 2018 +0100
+  
+      First version of recursive Fibonacci sequence
+&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;/div&gt;
+&lt;div class="cell border-box-sizing text_cell rendered"&gt;&lt;div class="prompt input_prompt"&gt;
+&lt;/div&gt;
+&lt;div class="inner_cell"&gt;
+&lt;div class="text_cell_render border-box-sizing rendered_html"&gt;
+&lt;p&gt;Okay, we have two branches (&lt;code&gt;master&lt;/code&gt; and &lt;code&gt;make_faster&lt;/code&gt;), which both have commits not present in the other&amp;nbsp;one.&lt;/p&gt;
+&lt;p&gt;Time to get back to development and trying to make our program faster where our developer notices a serious&amp;nbsp;problem:&lt;/p&gt;
+
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="cell border-box-sizing code_cell rendered"&gt;
+&lt;div class="input"&gt;
+&lt;div class="prompt input_prompt"&gt;In&amp;nbsp;[13]:&lt;/div&gt;
+
+&lt;div class="inner_cell"&gt;
+    &lt;div class="input_area"&gt;
+        &lt;div class=" highlight hl-ipython3"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;%%bash
+git checkout make_faster
+&lt;span class="k"&gt;for&lt;/span&gt; i in &lt;span class="sb"&gt;`&lt;/span&gt;seq &lt;span class="m"&gt;0&lt;/span&gt; &lt;span class="m"&gt;5&lt;/span&gt;&lt;span class="sb"&gt;`&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt; &lt;span class="k"&gt;do&lt;/span&gt; &lt;span class="nb"&gt;echo&lt;/span&gt; -n &lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="nv"&gt;$i&lt;/span&gt;&lt;span class="s2"&gt; &amp;quot;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt; python ./fibonacci.py &lt;span class="nv"&gt;$i&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt; &lt;span class="k"&gt;done&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+    &lt;/div&gt;
+&lt;/div&gt;
+
+&lt;/div&gt;
+
+&lt;div class="output_wrapper"&gt;
+&lt;div class="output"&gt;
+
+
+&lt;div class="output_area"&gt;
+
+&lt;div class="prompt"&gt;&lt;/div&gt;
+
+
+&lt;div class="output_subarea output_stream output_stdout output_text"&gt;
+&lt;pre class="ipynb"&gt;0 1
+Executed in 4.4e-05 seconds
+1 1
+Executed in 2.3e-05 seconds
+2 2
+Executed in 2e-05 seconds
+3 3
+Executed in 1.7e-05 seconds
+4 5
+Executed in 1.9e-05 seconds
+5 8
+Executed in 2.3e-05 seconds
+&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;div class="output_area"&gt;
+
+&lt;div class="prompt"&gt;&lt;/div&gt;
+
+
+&lt;div class="output_subarea output_stream output_stderr output_text"&gt;
+&lt;pre class="ipynb"&gt;Switched to branch &amp;#39;make_faster&amp;#39;
+&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;/div&gt;
+&lt;div class="cell border-box-sizing text_cell rendered"&gt;&lt;div class="prompt input_prompt"&gt;
+&lt;/div&gt;
+&lt;div class="inner_cell"&gt;
+&lt;div class="text_cell_render border-box-sizing rendered_html"&gt;
+&lt;p&gt;Our Fibonacci series is off by one! &lt;code&gt;fibonacci(0)&lt;/code&gt; should be 0, and &lt;code&gt;fibonacci(4)&lt;/code&gt; should be 3, while &lt;code&gt;fibonacci(5)&lt;/code&gt; should 5. Let&amp;#8217;s fix this&amp;nbsp;first.&lt;/p&gt;
+
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="cell border-box-sizing code_cell rendered"&gt;
+&lt;div class="input"&gt;
+&lt;div class="prompt input_prompt"&gt;In&amp;nbsp;[14]:&lt;/div&gt;
+
+&lt;div class="inner_cell"&gt;
+    &lt;div class="input_area"&gt;
+        &lt;div class=" highlight hl-ipython3"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="o"&gt;%%&lt;/span&gt;&lt;span class="k"&gt;writefile&lt;/span&gt; fibonacci.py
+
+import sys
+import time
+
+def fibonacci(n):
+    &amp;quot;&amp;quot;&amp;quot;Computes the n-th Fibonacci by recursion&amp;quot;&amp;quot;&amp;quot;
+    if n in [0, 1]:
+        return n  # Return n, not 1!
+    else:
+        return fibonacci(n - 1) + fibonacci(n - 2)
+    
+if __name__ == &amp;quot;__main__&amp;quot;:
+    t0 = time.time()
+    print(fibonacci(int(sys.argv[1])))
+    duration = time.time() - t0
+    print(f&amp;#39;Executed in {duration:.2} seconds&amp;#39;)
+&lt;/pre&gt;&lt;/div&gt;
+
+    &lt;/div&gt;
+&lt;/div&gt;
+
+&lt;/div&gt;
+
+&lt;div class="output_wrapper"&gt;
+&lt;div class="output"&gt;
+
+
+&lt;div class="output_area"&gt;
+
+&lt;div class="prompt"&gt;&lt;/div&gt;
+
+
+&lt;div class="output_subarea output_stream output_stdout output_text"&gt;
+&lt;pre class="ipynb"&gt;Overwriting fibonacci.py
+&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;/div&gt;
+&lt;div class="cell border-box-sizing code_cell rendered"&gt;
+&lt;div class="input"&gt;
+&lt;div class="prompt input_prompt"&gt;In&amp;nbsp;[15]:&lt;/div&gt;
+
+&lt;div class="inner_cell"&gt;
+    &lt;div class="input_area"&gt;
+        &lt;div class=" highlight hl-ipython3"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="c1"&gt;# Let&amp;#39;s make some simple test. These should really be automated unit tests …&lt;/span&gt;
+&lt;span class="k"&gt;assert&lt;/span&gt; &lt;span class="n"&gt;fibonacci&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;5&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;==&lt;/span&gt; &lt;span class="mi"&gt;5&lt;/span&gt;
+&lt;span class="k"&gt;assert&lt;/span&gt; &lt;span class="n"&gt;fibonacci&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;==&lt;/span&gt; &lt;span class="mi"&gt;1&lt;/span&gt;
+&lt;span class="k"&gt;assert&lt;/span&gt; &lt;span class="n"&gt;fibonacci&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;10&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;==&lt;/span&gt; &lt;span class="mi"&gt;55&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+    &lt;/div&gt;
+&lt;/div&gt;
+
+&lt;/div&gt;
+
+&lt;/div&gt;
+&lt;div class="cell border-box-sizing code_cell rendered"&gt;
+&lt;div class="input"&gt;
+&lt;div class="prompt input_prompt"&gt;In&amp;nbsp;[16]:&lt;/div&gt;
+
+&lt;div class="inner_cell"&gt;
+    &lt;div class="input_area"&gt;
+        &lt;div class=" highlight hl-ipython3"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="o"&gt;!&lt;/span&gt;git commit -m &lt;span class="s2"&gt;&amp;quot;fix obiwan bug in fibonacci&amp;quot;&lt;/span&gt; fibonacci.py
+&lt;/pre&gt;&lt;/div&gt;
+
+    &lt;/div&gt;
+&lt;/div&gt;
+
+&lt;/div&gt;
+
+&lt;div class="output_wrapper"&gt;
+&lt;div class="output"&gt;
+
+
+&lt;div class="output_area"&gt;
+
+&lt;div class="prompt"&gt;&lt;/div&gt;
+
+
+&lt;div class="output_subarea output_stream output_stdout output_text"&gt;
+&lt;pre class="ipynb"&gt;[make_faster 33e0161] fix obiwan bug in fibonacci
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;/div&gt;
+&lt;div class="cell border-box-sizing text_cell rendered"&gt;&lt;div class="prompt input_prompt"&gt;
+&lt;/div&gt;
+&lt;div class="inner_cell"&gt;
+&lt;div class="text_cell_render border-box-sizing rendered_html"&gt;
+&lt;p&gt;Phew, this fix is important enough that it should go directly into our production code in master. This time, however, we&amp;#8217;ll follow the good (best?!) practice of not committing to master directly but create a bug fix branch. This could then be reviewed before being merged into master. We don&amp;#8217;t want to merge the &lt;code&gt;make_faster&lt;/code&gt; branch into &lt;code&gt;master&lt;/code&gt;, because our developer is experimenting and has littered it with debugging code, and god know&amp;#8217;s what he&amp;#8217;s been trying&amp;nbsp;there.&lt;/p&gt;
+&lt;p&gt;We make a note of the bug fix (short) commit hash (&lt;code&gt;33e0161&lt;/code&gt;) now, but could of course retrieve this later from &lt;code&gt;git log&lt;/code&gt; as well. This is the one we will cherry-pick into our bug fix&amp;nbsp;branch.&lt;/p&gt;
+
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="cell border-box-sizing code_cell rendered"&gt;
+&lt;div class="input"&gt;
+&lt;div class="prompt input_prompt"&gt;In&amp;nbsp;[17]:&lt;/div&gt;
+
+&lt;div class="inner_cell"&gt;
+    &lt;div class="input_area"&gt;
+        &lt;div class=" highlight hl-ipython3"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;%%bash
+&lt;span class="c1"&gt;# We want to fix master, so we&amp;#39;ll branch from there&lt;/span&gt;
+git checkout master
+git checkout -b fix_obiwan
+git cherry-pick 33e0161
+&lt;/pre&gt;&lt;/div&gt;
+
+    &lt;/div&gt;
+&lt;/div&gt;
+
+&lt;/div&gt;
+
+&lt;div class="output_wrapper"&gt;
+&lt;div class="output"&gt;
+
+
+&lt;div class="output_area"&gt;
+
+&lt;div class="prompt"&gt;&lt;/div&gt;
+
+
+&lt;div class="output_subarea output_stream output_stdout output_text"&gt;
+&lt;pre class="ipynb"&gt;[fix_obiwan dbff8eb] fix obiwan bug in fibonacci
+ Date: Sat Mar 17 00:06:02 2018 +0100
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;div class="output_area"&gt;
+
+&lt;div class="prompt"&gt;&lt;/div&gt;
+
+
+&lt;div class="output_subarea output_stream output_stderr output_text"&gt;
+&lt;pre class="ipynb"&gt;Switched to branch &amp;#39;master&amp;#39;
+Switched to a new branch &amp;#39;fix_obiwan&amp;#39;
+&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;/div&gt;
+&lt;div class="cell border-box-sizing text_cell rendered"&gt;&lt;div class="prompt input_prompt"&gt;
+&lt;/div&gt;
+&lt;div class="inner_cell"&gt;
+&lt;div class="text_cell_render border-box-sizing rendered_html"&gt;
+&lt;p&gt;And then, after code review, etc. this bug fix branch is merged into&amp;nbsp;master.&lt;/p&gt;
+
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="cell border-box-sizing code_cell rendered"&gt;
+&lt;div class="input"&gt;
+&lt;div class="prompt input_prompt"&gt;In&amp;nbsp;[18]:&lt;/div&gt;
+
+&lt;div class="inner_cell"&gt;
+    &lt;div class="input_area"&gt;
+        &lt;div class=" highlight hl-ipython3"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;%%bash
+git checkout master
+git merge fix_obiwan
+&lt;/pre&gt;&lt;/div&gt;
+
+    &lt;/div&gt;
+&lt;/div&gt;
+
+&lt;/div&gt;
+
+&lt;div class="output_wrapper"&gt;
+&lt;div class="output"&gt;
+
+
+&lt;div class="output_area"&gt;
+
+&lt;div class="prompt"&gt;&lt;/div&gt;
+
+
+&lt;div class="output_subarea output_stream output_stdout output_text"&gt;
+&lt;pre class="ipynb"&gt;Updating cfd121c..dbff8eb
+Fast-forward
+ fibonacci.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;div class="output_area"&gt;
+
+&lt;div class="prompt"&gt;&lt;/div&gt;
+
+
+&lt;div class="output_subarea output_stream output_stderr output_text"&gt;
+&lt;pre class="ipynb"&gt;Switched to branch &amp;#39;master&amp;#39;
+&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;/div&gt;
+&lt;div class="cell border-box-sizing text_cell rendered"&gt;&lt;div class="prompt input_prompt"&gt;
+&lt;/div&gt;
+&lt;div class="inner_cell"&gt;
+&lt;div class="text_cell_render border-box-sizing rendered_html"&gt;
+&lt;p&gt;Meanwhile our developer has an epiphany. Every time the recursion calls &lt;code&gt;fibonacci(n - 2)&lt;/code&gt; it computes the same values that the previous call to &lt;code&gt;fibonacci(n - 1)&lt;/code&gt; already computed. If only there was a way to cache the results of previous function calls … Well, this being Python, of course there&amp;nbsp;is.&lt;/p&gt;
+
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="cell border-box-sizing code_cell rendered"&gt;
+&lt;div class="input"&gt;
+&lt;div class="prompt input_prompt"&gt;In&amp;nbsp;[19]:&lt;/div&gt;
+
+&lt;div class="inner_cell"&gt;
+    &lt;div class="input_area"&gt;
+        &lt;div class=" highlight hl-ipython3"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="o"&gt;!&lt;/span&gt;git checkout make_faster
+&lt;/pre&gt;&lt;/div&gt;
+
+    &lt;/div&gt;
+&lt;/div&gt;
+
+&lt;/div&gt;
+
+&lt;div class="output_wrapper"&gt;
+&lt;div class="output"&gt;
+
+
+&lt;div class="output_area"&gt;
+
+&lt;div class="prompt"&gt;&lt;/div&gt;
+
+
+&lt;div class="output_subarea output_stream output_stdout output_text"&gt;
+&lt;pre class="ipynb"&gt;Switched to branch &amp;#39;make_faster&amp;#39;
+&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;/div&gt;
+&lt;div class="cell border-box-sizing code_cell rendered"&gt;
+&lt;div class="input"&gt;
+&lt;div class="prompt input_prompt"&gt;In&amp;nbsp;[20]:&lt;/div&gt;
+
+&lt;div class="inner_cell"&gt;
+    &lt;div class="input_area"&gt;
+        &lt;div class=" highlight hl-ipython3"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="o"&gt;%%&lt;/span&gt;&lt;span class="k"&gt;writefile&lt;/span&gt; fibonacci.py
+
+from functools import lru_cache
+import sys
+import time
+
+
+@lru_cache()
+def fibonacci(n):
+    &amp;quot;&amp;quot;&amp;quot;Computes the n-th Fibonacci by recursion&amp;quot;&amp;quot;&amp;quot;
+    if n in [0, 1]:
+        return n  # Return n, not 1!
+    else:
+        return fibonacci(n - 1) + fibonacci(n - 2)
+    
+if __name__ == &amp;quot;__main__&amp;quot;:
+    t0 = time.time()
+    print(fibonacci(int(sys.argv[1])))
+    duration = time.time() - t0
+    print(f&amp;#39;Executed in {duration:.2} seconds&amp;#39;)
+&lt;/pre&gt;&lt;/div&gt;
+
+    &lt;/div&gt;
+&lt;/div&gt;
+
+&lt;/div&gt;
+
+&lt;div class="output_wrapper"&gt;
+&lt;div class="output"&gt;
+
+
+&lt;div class="output_area"&gt;
+
+&lt;div class="prompt"&gt;&lt;/div&gt;
+
+
+&lt;div class="output_subarea output_stream output_stdout output_text"&gt;
+&lt;pre class="ipynb"&gt;Overwriting fibonacci.py
+&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;/div&gt;
+&lt;div class="cell border-box-sizing code_cell rendered"&gt;
+&lt;div class="input"&gt;
+&lt;div class="prompt input_prompt"&gt;In&amp;nbsp;[21]:&lt;/div&gt;
+
+&lt;div class="inner_cell"&gt;
+    &lt;div class="input_area"&gt;
+        &lt;div class=" highlight hl-ipython3"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="o"&gt;!&lt;/span&gt;python ./fibonacci.py &lt;span class="m"&gt;100&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+    &lt;/div&gt;
+&lt;/div&gt;
+
+&lt;/div&gt;
+
+&lt;div class="output_wrapper"&gt;
+&lt;div class="output"&gt;
+
+
+&lt;div class="output_area"&gt;
+
+&lt;div class="prompt"&gt;&lt;/div&gt;
+
+
+&lt;div class="output_subarea output_stream output_stdout output_text"&gt;
+&lt;pre class="ipynb"&gt;354224848179261915075
+Executed in 0.00012 seconds
+&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;/div&gt;
+&lt;div class="cell border-box-sizing text_cell rendered"&gt;&lt;div class="prompt input_prompt"&gt;
+&lt;/div&gt;
+&lt;div class="inner_cell"&gt;
+&lt;div class="text_cell_render border-box-sizing rendered_html"&gt;
+&lt;p&gt;Whoah, that&amp;#8217;s a lot faster than 4 Myr! Let&amp;#8217;s commit this and then clean&amp;nbsp;up.&lt;/p&gt;
+
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="cell border-box-sizing code_cell rendered"&gt;
+&lt;div class="input"&gt;
+&lt;div class="prompt input_prompt"&gt;In&amp;nbsp;[22]:&lt;/div&gt;
+
+&lt;div class="inner_cell"&gt;
+    &lt;div class="input_area"&gt;
+        &lt;div class=" highlight hl-ipython3"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="o"&gt;!&lt;/span&gt;git commit -m &lt;span class="s2"&gt;&amp;quot;speed up by using least-recently used cache decorator&amp;quot;&lt;/span&gt; fibonacci.py
+&lt;/pre&gt;&lt;/div&gt;
+
+    &lt;/div&gt;
+&lt;/div&gt;
+
+&lt;/div&gt;
+
+&lt;div class="output_wrapper"&gt;
+&lt;div class="output"&gt;
+
+
+&lt;div class="output_area"&gt;
+
+&lt;div class="prompt"&gt;&lt;/div&gt;
+
+
+&lt;div class="output_subarea output_stream output_stdout output_text"&gt;
+&lt;pre class="ipynb"&gt;[make_faster abf1332] speed up by using least-recently used cache decorator
+ 1 file changed, 3 insertions(+)
+&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;/div&gt;
+&lt;div class="cell border-box-sizing code_cell rendered"&gt;
+&lt;div class="input"&gt;
+&lt;div class="prompt input_prompt"&gt;In&amp;nbsp;[23]:&lt;/div&gt;
+
+&lt;div class="inner_cell"&gt;
+    &lt;div class="input_area"&gt;
+        &lt;div class=" highlight hl-ipython3"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="o"&gt;%%&lt;/span&gt;&lt;span class="k"&gt;writefile&lt;/span&gt; fibonacci.py
+
+from functools import lru_cache
+import sys
+
+@lru_cache()
+def fibonacci(n):
+    &amp;quot;&amp;quot;&amp;quot;Computes the n-th Fibonacci by recursion&amp;quot;&amp;quot;&amp;quot;
+    if n in [0, 1]:
+        return n  # Return n, not 1!
+    else:
+        return fibonacci(n - 1) + fibonacci(n - 2)
+    
+if __name__ == &amp;quot;__main__&amp;quot;:
+    print(fibonacci(int(sys.argv[1])))
+&lt;/pre&gt;&lt;/div&gt;
+
+    &lt;/div&gt;
+&lt;/div&gt;
+
+&lt;/div&gt;
+
+&lt;div class="output_wrapper"&gt;
+&lt;div class="output"&gt;
+
+
+&lt;div class="output_area"&gt;
+
+&lt;div class="prompt"&gt;&lt;/div&gt;
+
+
+&lt;div class="output_subarea output_stream output_stdout output_text"&gt;
+&lt;pre class="ipynb"&gt;Overwriting fibonacci.py
+&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;/div&gt;
+&lt;div class="cell border-box-sizing code_cell rendered"&gt;
+&lt;div class="input"&gt;
+&lt;div class="prompt input_prompt"&gt;In&amp;nbsp;[24]:&lt;/div&gt;
+
+&lt;div class="inner_cell"&gt;
+    &lt;div class="input_area"&gt;
+        &lt;div class=" highlight hl-ipython3"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;%%bash
+git commit -m &lt;span class="s2"&gt;&amp;quot;remove debugging statements&amp;quot;&lt;/span&gt; fibonacci.py
+git checkout master
+git merge make_faster
+&lt;/pre&gt;&lt;/div&gt;
+
+    &lt;/div&gt;
+&lt;/div&gt;
+
+&lt;/div&gt;
+
+&lt;div class="output_wrapper"&gt;
+&lt;div class="output"&gt;
+
+
+&lt;div class="output_area"&gt;
+
+&lt;div class="prompt"&gt;&lt;/div&gt;
+
+
+&lt;div class="output_subarea output_stream output_stdout output_text"&gt;
+&lt;pre class="ipynb"&gt;[make_faster 6d8d63f] remove debugging statements
+ 1 file changed, 1 insertion(+), 6 deletions(-)
+Auto-merging fibonacci.py
+Merge made by the &amp;#39;recursive&amp;#39; strategy.
+ fibonacci.py | 3 +++
+ 1 file changed, 3 insertions(+)
+&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;div class="output_area"&gt;
+
+&lt;div class="prompt"&gt;&lt;/div&gt;
+
+
+&lt;div class="output_subarea output_stream output_stderr output_text"&gt;
+&lt;pre class="ipynb"&gt;Switched to branch &amp;#39;master&amp;#39;
+&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;/div&gt;
+&lt;div class="cell border-box-sizing code_cell rendered"&gt;
+&lt;div class="input"&gt;
+&lt;div class="prompt input_prompt"&gt;In&amp;nbsp;[25]:&lt;/div&gt;
+
+&lt;div class="inner_cell"&gt;
+    &lt;div class="input_area"&gt;
+        &lt;div class=" highlight hl-ipython3"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="o"&gt;!&lt;/span&gt;git log --all --graph
+&lt;/pre&gt;&lt;/div&gt;
+
+    &lt;/div&gt;
+&lt;/div&gt;
+
+&lt;/div&gt;
+
+&lt;div class="output_wrapper"&gt;
+&lt;div class="output"&gt;
+
+
+&lt;div class="output_area"&gt;
+
+&lt;div class="prompt"&gt;&lt;/div&gt;
+
+
+&lt;div class="output_subarea output_stream output_stdout output_text"&gt;
+&lt;pre class="ipynb"&gt;*   &lt;span class="ansi-yellow-fg"&gt;commit 06f69272a3289715bae44ba8bc00701dc13c84f6&lt;/span&gt;
+&lt;span class="ansi-red-fg"&gt;|&lt;/span&gt;&lt;span class="ansi-green-fg"&gt;\&lt;/span&gt;  Merge: dbff8eb 6d8d63f
+&lt;span class="ansi-red-fg"&gt;|&lt;/span&gt; &lt;span class="ansi-green-fg"&gt;|&lt;/span&gt; Author: Jörg Dietrich &amp;lt;astro@joergdietrich.com&amp;gt;
+&lt;span class="ansi-red-fg"&gt;|&lt;/span&gt; &lt;span class="ansi-green-fg"&gt;|&lt;/span&gt; Date:   Sat Mar 17 00:06:43 2018 +0100
+&lt;span class="ansi-red-fg"&gt;|&lt;/span&gt; &lt;span class="ansi-green-fg"&gt;|&lt;/span&gt; 
+&lt;span class="ansi-red-fg"&gt;|&lt;/span&gt; &lt;span class="ansi-green-fg"&gt;|&lt;/span&gt;     Merge branch &amp;#39;make_faster&amp;#39;
+&lt;span class="ansi-red-fg"&gt;|&lt;/span&gt; &lt;span class="ansi-green-fg"&gt;|&lt;/span&gt;   
+&lt;span class="ansi-red-fg"&gt;|&lt;/span&gt; * &lt;span class="ansi-yellow-fg"&gt;commit 6d8d63f612ae1b087f1449b24d7b50de3665b280&lt;/span&gt;
+&lt;span class="ansi-red-fg"&gt;|&lt;/span&gt; &lt;span class="ansi-green-fg"&gt;|&lt;/span&gt; Author: Jörg Dietrich &amp;lt;astro@joergdietrich.com&amp;gt;
+&lt;span class="ansi-red-fg"&gt;|&lt;/span&gt; &lt;span class="ansi-green-fg"&gt;|&lt;/span&gt; Date:   Sat Mar 17 00:06:43 2018 +0100
+&lt;span class="ansi-red-fg"&gt;|&lt;/span&gt; &lt;span class="ansi-green-fg"&gt;|&lt;/span&gt; 
+&lt;span class="ansi-red-fg"&gt;|&lt;/span&gt; &lt;span class="ansi-green-fg"&gt;|&lt;/span&gt;     remove debugging statements
+&lt;span class="ansi-red-fg"&gt;|&lt;/span&gt; &lt;span class="ansi-green-fg"&gt;|&lt;/span&gt;   
+&lt;span class="ansi-red-fg"&gt;|&lt;/span&gt; * &lt;span class="ansi-yellow-fg"&gt;commit abf13323a213d94dd4fe0c095e9d4a50335dd253&lt;/span&gt;
+&lt;span class="ansi-red-fg"&gt;|&lt;/span&gt; &lt;span class="ansi-green-fg"&gt;|&lt;/span&gt; Author: Jörg Dietrich &amp;lt;astro@joergdietrich.com&amp;gt;
+&lt;span class="ansi-red-fg"&gt;|&lt;/span&gt; &lt;span class="ansi-green-fg"&gt;|&lt;/span&gt; Date:   Sat Mar 17 00:06:37 2018 +0100
+&lt;span class="ansi-red-fg"&gt;|&lt;/span&gt; &lt;span class="ansi-green-fg"&gt;|&lt;/span&gt; 
+&lt;span class="ansi-red-fg"&gt;|&lt;/span&gt; &lt;span class="ansi-green-fg"&gt;|&lt;/span&gt;     speed up by using least-recently used cache decorator
+&lt;span class="ansi-red-fg"&gt;|&lt;/span&gt; &lt;span class="ansi-green-fg"&gt;|&lt;/span&gt;   
+&lt;span class="ansi-red-fg"&gt;|&lt;/span&gt; * &lt;span class="ansi-yellow-fg"&gt;commit 33e016177dd7c3805767decd4f6d45b58bded942&lt;/span&gt;
+&lt;span class="ansi-red-fg"&gt;|&lt;/span&gt; &lt;span class="ansi-green-fg"&gt;|&lt;/span&gt; Author: Jörg Dietrich &amp;lt;astro@joergdietrich.com&amp;gt;
+&lt;span class="ansi-red-fg"&gt;|&lt;/span&gt; &lt;span class="ansi-green-fg"&gt;|&lt;/span&gt; Date:   Sat Mar 17 00:06:02 2018 +0100
+&lt;span class="ansi-red-fg"&gt;|&lt;/span&gt; &lt;span class="ansi-green-fg"&gt;|&lt;/span&gt; 
+&lt;span class="ansi-red-fg"&gt;|&lt;/span&gt; &lt;span class="ansi-green-fg"&gt;|&lt;/span&gt;     fix obiwan bug in fibonacci
+&lt;span class="ansi-red-fg"&gt;|&lt;/span&gt; &lt;span class="ansi-green-fg"&gt;|&lt;/span&gt;   
+&lt;span class="ansi-red-fg"&gt;|&lt;/span&gt; * &lt;span class="ansi-yellow-fg"&gt;commit 7a418cdc3dc2effa01829ab3c45dab3f0777a35b&lt;/span&gt;
+&lt;span class="ansi-red-fg"&gt;|&lt;/span&gt; &lt;span class="ansi-green-fg"&gt;|&lt;/span&gt; Author: Jörg Dietrich &amp;lt;astro@joergdietrich.com&amp;gt;
+&lt;span class="ansi-red-fg"&gt;|&lt;/span&gt; &lt;span class="ansi-green-fg"&gt;|&lt;/span&gt; Date:   Sat Mar 17 00:05:19 2018 +0100
+&lt;span class="ansi-red-fg"&gt;|&lt;/span&gt; &lt;span class="ansi-green-fg"&gt;|&lt;/span&gt; 
+&lt;span class="ansi-red-fg"&gt;|&lt;/span&gt; &lt;span class="ansi-green-fg"&gt;|&lt;/span&gt;     add debugging timer
+&lt;span class="ansi-red-fg"&gt;|&lt;/span&gt; &lt;span class="ansi-green-fg"&gt;|&lt;/span&gt;   
+* &lt;span class="ansi-green-fg"&gt;|&lt;/span&gt; &lt;span class="ansi-yellow-fg"&gt;commit dbff8eba5b33067c6a9dbe468c46f71b742fce6a&lt;/span&gt;
+&lt;span class="ansi-green-fg"&gt;|&lt;/span&gt; &lt;span class="ansi-green-fg"&gt;|&lt;/span&gt; Author: Jörg Dietrich &amp;lt;astro@joergdietrich.com&amp;gt;
+&lt;span class="ansi-green-fg"&gt;|&lt;/span&gt; &lt;span class="ansi-green-fg"&gt;|&lt;/span&gt; Date:   Sat Mar 17 00:06:02 2018 +0100
+&lt;span class="ansi-green-fg"&gt;|&lt;/span&gt; &lt;span class="ansi-green-fg"&gt;|&lt;/span&gt; 
+&lt;span class="ansi-green-fg"&gt;|&lt;/span&gt; &lt;span class="ansi-green-fg"&gt;|&lt;/span&gt;     fix obiwan bug in fibonacci
+&lt;span class="ansi-green-fg"&gt;|&lt;/span&gt; &lt;span class="ansi-green-fg"&gt;|&lt;/span&gt;   
+* &lt;span class="ansi-green-fg"&gt;|&lt;/span&gt; &lt;span class="ansi-yellow-fg"&gt;commit cfd121c94a0d96a73aad4fae30b646fb176e7398&lt;/span&gt;
+&lt;span class="ansi-green-fg"&gt;|&lt;/span&gt;&lt;span class="ansi-green-fg"&gt;/&lt;/span&gt;  Author: Jörg Dietrich &amp;lt;astro@joergdietrich.com&amp;gt;
+&lt;span class="ansi-green-fg"&gt;|&lt;/span&gt;   Date:   Sat Mar 17 00:05:34 2018 +0100
+&lt;span class="ansi-green-fg"&gt;|&lt;/span&gt;   
+&lt;span class="ansi-green-fg"&gt;|&lt;/span&gt;       ensure that n is an integer or cast to int
+&lt;span class="ansi-green-fg"&gt;|&lt;/span&gt;  
+* &lt;span class="ansi-yellow-fg"&gt;commit b90d77e2d9fd1a0e5e1f8383751ca6a208264e6c&lt;/span&gt;
+  Author: Jörg Dietrich &amp;lt;astro@joergdietrich.com&amp;gt;
+  Date:   Sat Mar 17 00:04:49 2018 +0100
+  
+      First version of recursive Fibonacci sequence
+&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;/div&gt;
+&lt;div class="cell border-box-sizing text_cell rendered"&gt;&lt;div class="prompt input_prompt"&gt;
+&lt;/div&gt;
+&lt;div class="inner_cell"&gt;
+&lt;div class="text_cell_render border-box-sizing rendered_html"&gt;
+&lt;p&gt;Great, we merged everything back into one branch! There cherry-picked bug fix, which was modification in both branches did not cause a merge&amp;nbsp;conflict.&lt;/p&gt;
+&lt;p&gt;In summary, &lt;code&gt;git cherry-pick&lt;/code&gt; is a convenient way to quickly backport important bug fixes from development branches to more slowly moving branches, such as stable&amp;nbsp;releases.&lt;/p&gt;
+&lt;p&gt;And finally, there&amp;#8217;s of course no need to compute the Fibonacci sequence with recursion. One could as well do this&amp;nbsp;iteratively.&lt;/p&gt;
+
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="cell border-box-sizing text_cell rendered"&gt;&lt;div class="prompt input_prompt"&gt;
+&lt;/div&gt;
+&lt;div class="inner_cell"&gt;
+&lt;div class="text_cell_render border-box-sizing rendered_html"&gt;
+&lt;p&gt;&lt;small&gt;
+&lt;a rel=\"license\" href=\"http://creativecommons.org/licenses/by-sa/4.0/\"&gt;This blog 
+post is licensed under a &lt;a rel=\"license\" href=\"http://creativecommons.org/licenses/by-
+sa/4.0/\"&gt;Creative Commons Attribution-ShareAlike 4.0 International License&lt;/a&gt;. This post
+ was written as a &lt;a href=\"http://www.jupyter.org/\"&gt;Jupyter Notebook&lt;/a&gt; in Python. You 
+can &lt;a href=\"https://raw.githubusercontent.com/joergdietrich/joergdietrich.github.io/mast
+er/notebooks/git_cherry-pick.ipynb\"&gt;download&lt;/a&gt; the original notebook.&lt;/small&gt;&lt;/p&gt;
+
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+ 
+
+&lt;/p&gt;</content><category term="git"></category><category term="version control"></category></entry><entry><title>Using matplotlib to plot over existing Figures</title><link href="http://joergdietrich.github.io/matplotlib-overplot.html" rel="alternate"></link><published>2017-01-26T00:00:00+01:00</published><updated>2017-01-26T00:00:00+01:00</updated><author><name>Jörg Dietrich</name></author><id>tag:joergdietrich.github.io,2017-01-26:/matplotlib-overplot.html</id><summary type="html">&lt;p&gt;
+&lt;div class="cell border-box-sizing text_cell rendered"&gt;&lt;div class="prompt input_prompt"&gt;
+&lt;/div&gt;
+&lt;div class="inner_cell"&gt;
+&lt;div class="text_cell_render border-box-sizing rendered_html"&gt;
+&lt;p&gt;Shortly before Christmas a paper by Nathalia Cibirka and colleagues appeared as &lt;a href="https://arxiv.org/abs/1612.06871"&gt;arXiv:1612.06871&lt;/a&gt; in which she studies the concentration of galaxy clusters using weak lensing. This topic is very close to my research interests and I immediately skimmed through the paper. The primary question in my mind was …&lt;/p&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;/p&gt;</summary><content type="html">&lt;p&gt;
+&lt;div class="cell border-box-sizing text_cell rendered"&gt;&lt;div class="prompt input_prompt"&gt;
 &lt;/div&gt;
 &lt;div class="inner_cell"&gt;
 &lt;div class="text_cell_render border-box-sizing rendered_html"&gt;
@@ -32,8 +1270,8 @@
 &lt;span class="n"&gt;c&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;concentration&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;modelDiemer15fromM&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;m200&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mf"&gt;0.5&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
 &lt;span class="n"&gt;plt&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;plot&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;np&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;log10&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;m200&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt; &lt;span class="n"&gt;c&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;b--&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;linewidth&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="mi"&gt;2&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;label&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;Diemer \&amp;amp; Kravtsov 2015&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
 &lt;span class="n"&gt;plt&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;legend&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;loc&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;upper left&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;frameon&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="kc"&gt;False&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
-&lt;span class="n"&gt;plt&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;xlabel&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;r&amp;quot;$\log_&lt;/span&gt;&lt;span class="si"&gt;{10}&lt;/span&gt;&lt;span class="s2"&gt;M_\odot h^{-1}$&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
-&lt;span class="n"&gt;plt&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;ylabel&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;r&amp;quot;$c$&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;span class="n"&gt;plt&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;xlabel&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="sa"&gt;r&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;$\log_&lt;/span&gt;&lt;span class="si"&gt;{10}&lt;/span&gt;&lt;span class="s2"&gt;M_\odot h^{-1}$&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="n"&gt;plt&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;ylabel&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="sa"&gt;r&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;$c$&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 
     &lt;/div&gt;
@@ -45,7 +1283,11 @@
 &lt;div class="output"&gt;
 
 
-&lt;div class="output_area"&gt;&lt;div class="prompt"&gt;&lt;/div&gt;
+&lt;div class="output_area"&gt;
+
+&lt;div class="prompt"&gt;&lt;/div&gt;
+
+
 
 
 &lt;div class="output_png output_subarea "&gt;
@@ -260,8 +1502,7 @@ IiIJUSIREZGE/D8I+rc2762V3QAAAABJRU5ErkJggg==
 &lt;/div&gt;
 
 &lt;/div&gt;
-&lt;div class="cell border-box-sizing text_cell rendered"&gt;
-&lt;div class="prompt input_prompt"&gt;
+&lt;div class="cell border-box-sizing text_cell rendered"&gt;&lt;div class="prompt input_prompt"&gt;
 &lt;/div&gt;
 &lt;div class="inner_cell"&gt;
 &lt;div class="text_cell_render border-box-sizing rendered_html"&gt;
@@ -290,8 +1531,8 @@ IiIJUSIREZGE/D8I+rc2762V3QAAAABJRU5ErkJggg==
 &lt;span class="n"&gt;plt&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;plot&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;np&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;log10&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;m200&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt; &lt;span class="n"&gt;c&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;b--&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;linewidth&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="mi"&gt;4&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;label&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;Diemer \&amp;amp; Kravtsov 2015&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
         &lt;span class="n"&gt;zorder&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
 &lt;span class="n"&gt;plt&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;legend&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;loc&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;lower right&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;frameon&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="kc"&gt;False&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
-&lt;span class="n"&gt;plt&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;xlabel&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;r&amp;quot;$\log_&lt;/span&gt;&lt;span class="si"&gt;{10}&lt;/span&gt;&lt;span class="s2"&gt;M_\odot h^{-1}$&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;fontsize&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="mi"&gt;24&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
-&lt;span class="n"&gt;plt&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;ylabel&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;r&amp;quot;$c$&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="n"&gt;fontsize&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="mi"&gt;24&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="n"&gt;plt&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;xlabel&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="sa"&gt;r&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;$\log_&lt;/span&gt;&lt;span class="si"&gt;{10}&lt;/span&gt;&lt;span class="s2"&gt;M_\odot h^{-1}$&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;fontsize&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="mi"&gt;24&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="n"&gt;plt&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;ylabel&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="sa"&gt;r&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;$c$&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="n"&gt;fontsize&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="mi"&gt;24&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
 &lt;span class="n"&gt;plt&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;axis&lt;/span&gt;&lt;span class="p"&gt;([&lt;/span&gt;&lt;span class="n"&gt;xmin&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;xmax&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;ymin&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;ymax&lt;/span&gt;&lt;span class="p"&gt;]);&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 
@@ -304,7 +1545,11 @@ IiIJUSIREZGE/D8I+rc2762V3QAAAABJRU5ErkJggg==
 &lt;div class="output"&gt;
 
 
-&lt;div class="output_area"&gt;&lt;div class="prompt"&gt;&lt;/div&gt;
+&lt;div class="output_area"&gt;
+
+&lt;div class="prompt"&gt;&lt;/div&gt;
+
+
 
 
 &lt;div class="output_png output_subarea "&gt;
@@ -2698,8 +3943,7 @@ TaCwI4QQQgipCRR2hBBCCCE1gcKOEEIIIaQm/B+ygkKmtEVxSQAAAABJRU5ErkJggg==
 &lt;/div&gt;
 
 &lt;/div&gt;
-&lt;div class="cell border-box-sizing text_cell rendered"&gt;
-&lt;div class="prompt input_prompt"&gt;
+&lt;div class="cell border-box-sizing text_cell rendered"&gt;&lt;div class="prompt input_prompt"&gt;
 &lt;/div&gt;
 &lt;div class="inner_cell"&gt;
 &lt;div class="text_cell_render border-box-sizing rendered_html"&gt;
@@ -2709,8 +3953,7 @@ TaCwI4QQQgipCRR2hBBCCCE1gcKOEEIIIaQm/B+ygkKmtEVxSQAAAABJRU5ErkJggg==
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;/div&gt;
-&lt;div class="cell border-box-sizing text_cell rendered"&gt;
-&lt;div class="prompt input_prompt"&gt;
+&lt;div class="cell border-box-sizing text_cell rendered"&gt;&lt;div class="prompt input_prompt"&gt;
 &lt;/div&gt;
 &lt;div class="inner_cell"&gt;
 &lt;div class="text_cell_render border-box-sizing rendered_html"&gt;
@@ -2719,9 +3962,16 @@ TaCwI4QQQgipCRR2hBBCCCE1gcKOEEIIIaQm/B+ygkKmtEVxSQAAAABJRU5ErkJggg==
 
 &lt;/div&gt;
 &lt;/div&gt;
-&lt;/div&gt;&lt;/p&gt;</summary><category term="python"></category><category term="matplotlib"></category><category term="mass-concentration relation"></category></entry><entry><title>Python and numpy Bool Types</title><link href="http://joergdietrich.github.io/python-numpy-bool-types.html" rel="alternate"></link><updated>2016-11-29T00:00:00+01:00</updated><author><name>Jörg Dietrich</name></author><id>tag:joergdietrich.github.io,2016-11-29:python-numpy-bool-types.html</id><summary type="html">&lt;p&gt;
-&lt;div class="cell border-box-sizing text_cell rendered"&gt;
-&lt;div class="prompt input_prompt"&gt;
+&lt;/div&gt;
+ 
+
+&lt;/p&gt;</content><category term="python"></category><category term="matplotlib"></category><category term="mass-concentration relation"></category></entry><entry><title>Python and numpy Bool Types</title><link href="http://joergdietrich.github.io/python-numpy-bool-types.html" rel="alternate"></link><published>2016-11-29T00:00:00+01:00</published><updated>2016-11-29T00:00:00+01:00</updated><author><name>Jörg Dietrich</name></author><id>tag:joergdietrich.github.io,2016-11-29:/python-numpy-bool-types.html</id><summary type="html">&lt;p&gt;
+&lt;div class="cell border-box-sizing text_cell rendered"&gt;&lt;div class="prompt input_prompt"&gt;
+&lt;/div&gt;
+&lt;div class="inner_cell"&gt;
+&lt;div class="text_cell_render border-box-sizing rendered_html"&gt;
+&lt;p&gt;This blog post is triggered by a colleague stopping me in the hall and asking &amp;#8220;What does &lt;code&gt;~&lt;/code&gt; do in Python?&amp;#8221; She was surprised by the behavior of the &lt;code&gt;~&lt;/code&gt; operator when applied to Python bool types and I was surprised that it behaved differently on numpy bools than on Python bools …&lt;/p&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;/p&gt;</summary><content type="html">&lt;p&gt;
+&lt;div class="cell border-box-sizing text_cell rendered"&gt;&lt;div class="prompt input_prompt"&gt;
 &lt;/div&gt;
 &lt;div class="inner_cell"&gt;
 &lt;div class="text_cell_render border-box-sizing rendered_html"&gt;
@@ -2730,8 +3980,7 @@ TaCwI4QQQgipCRR2hBBCCCE1gcKOEEIIIaQm/B+ygkKmtEVxSQAAAABJRU5ErkJggg==
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;/div&gt;
-&lt;div class="cell border-box-sizing text_cell rendered"&gt;
-&lt;div class="prompt input_prompt"&gt;
+&lt;div class="cell border-box-sizing text_cell rendered"&gt;&lt;div class="prompt input_prompt"&gt;
 &lt;/div&gt;
 &lt;div class="inner_cell"&gt;
 &lt;div class="text_cell_render border-box-sizing rendered_html"&gt;
@@ -2760,7 +4009,11 @@ TaCwI4QQQgipCRR2hBBCCCE1gcKOEEIIIaQm/B+ygkKmtEVxSQAAAABJRU5ErkJggg==
 &lt;div class="output"&gt;
 
 
-&lt;div class="output_area"&gt;&lt;div class="prompt"&gt;&lt;/div&gt;
+&lt;div class="output_area"&gt;
+
+&lt;div class="prompt"&gt;&lt;/div&gt;
+
+
 &lt;div class="output_subarea output_stream output_stdout output_text"&gt;
 &lt;pre class="ipynb"&gt; 85 in binary: +1010101
 ~85 in binary: -1010110 is -86 in integer
@@ -2772,8 +4025,7 @@ TaCwI4QQQgipCRR2hBBCCCE1gcKOEEIIIaQm/B+ygkKmtEVxSQAAAABJRU5ErkJggg==
 &lt;/div&gt;
 
 &lt;/div&gt;
-&lt;div class="cell border-box-sizing text_cell rendered"&gt;
-&lt;div class="prompt input_prompt"&gt;
+&lt;div class="cell border-box-sizing text_cell rendered"&gt;&lt;div class="prompt input_prompt"&gt;
 &lt;/div&gt;
 &lt;div class="inner_cell"&gt;
 &lt;div class="text_cell_render border-box-sizing rendered_html"&gt;
@@ -2802,7 +4054,11 @@ TaCwI4QQQgipCRR2hBBCCCE1gcKOEEIIIaQm/B+ygkKmtEVxSQAAAABJRU5ErkJggg==
 &lt;div class="output"&gt;
 
 
-&lt;div class="output_area"&gt;&lt;div class="prompt"&gt;&lt;/div&gt;
+&lt;div class="output_area"&gt;
+
+&lt;div class="prompt"&gt;&lt;/div&gt;
+
+
 &lt;div class="output_subarea output_stream output_stdout output_text"&gt;
 &lt;pre class="ipynb"&gt; True in binary:  0b1
 ~True in binary: -0b10 is -2 in integer
@@ -2814,8 +4070,7 @@ TaCwI4QQQgipCRR2hBBCCCE1gcKOEEIIIaQm/B+ygkKmtEVxSQAAAABJRU5ErkJggg==
 &lt;/div&gt;
 
 &lt;/div&gt;
-&lt;div class="cell border-box-sizing text_cell rendered"&gt;
-&lt;div class="prompt input_prompt"&gt;
+&lt;div class="cell border-box-sizing text_cell rendered"&gt;&lt;div class="prompt input_prompt"&gt;
 &lt;/div&gt;
 &lt;div class="inner_cell"&gt;
 &lt;div class="text_cell_render border-box-sizing rendered_html"&gt;
@@ -2842,7 +4097,11 @@ TaCwI4QQQgipCRR2hBBCCCE1gcKOEEIIIaQm/B+ygkKmtEVxSQAAAABJRU5ErkJggg==
 &lt;div class="output"&gt;
 
 
-&lt;div class="output_area"&gt;&lt;div class="prompt"&gt;&lt;/div&gt;
+&lt;div class="output_area"&gt;
+
+&lt;div class="prompt"&gt;&lt;/div&gt;
+
+
 &lt;div class="output_subarea output_stream output_stdout output_text"&gt;
 &lt;pre class="ipynb"&gt;True
 &lt;/pre&gt;
@@ -2853,8 +4112,7 @@ TaCwI4QQQgipCRR2hBBCCCE1gcKOEEIIIaQm/B+ygkKmtEVxSQAAAABJRU5ErkJggg==
 &lt;/div&gt;
 
 &lt;/div&gt;
-&lt;div class="cell border-box-sizing text_cell rendered"&gt;
-&lt;div class="prompt input_prompt"&gt;
+&lt;div class="cell border-box-sizing text_cell rendered"&gt;&lt;div class="prompt input_prompt"&gt;
 &lt;/div&gt;
 &lt;div class="inner_cell"&gt;
 &lt;div class="text_cell_render border-box-sizing rendered_html"&gt;
@@ -2881,7 +4139,11 @@ TaCwI4QQQgipCRR2hBBCCCE1gcKOEEIIIaQm/B+ygkKmtEVxSQAAAABJRU5ErkJggg==
 &lt;div class="output"&gt;
 
 
-&lt;div class="output_area"&gt;&lt;div class="prompt"&gt;&lt;/div&gt;
+&lt;div class="output_area"&gt;
+
+&lt;div class="prompt"&gt;&lt;/div&gt;
+
+
 &lt;div class="output_subarea output_stream output_stdout output_text"&gt;
 &lt;pre class="ipynb"&gt;-1 True
 &lt;/pre&gt;
@@ -2892,8 +4154,7 @@ TaCwI4QQQgipCRR2hBBCCCE1gcKOEEIIIaQm/B+ygkKmtEVxSQAAAABJRU5ErkJggg==
 &lt;/div&gt;
 
 &lt;/div&gt;
-&lt;div class="cell border-box-sizing text_cell rendered"&gt;
-&lt;div class="prompt input_prompt"&gt;
+&lt;div class="cell border-box-sizing text_cell rendered"&gt;&lt;div class="prompt input_prompt"&gt;
 &lt;/div&gt;
 &lt;div class="inner_cell"&gt;
 &lt;div class="text_cell_render border-box-sizing rendered_html"&gt;
@@ -2920,7 +4181,11 @@ TaCwI4QQQgipCRR2hBBCCCE1gcKOEEIIIaQm/B+ygkKmtEVxSQAAAABJRU5ErkJggg==
 &lt;div class="output"&gt;
 
 
-&lt;div class="output_area"&gt;&lt;div class="prompt"&gt;&lt;/div&gt;
+&lt;div class="output_area"&gt;
+
+&lt;div class="prompt"&gt;&lt;/div&gt;
+
+
 &lt;div class="output_subarea output_stream output_stdout output_text"&gt;
 &lt;pre class="ipynb"&gt;False True
 &lt;/pre&gt;
@@ -2931,8 +4196,7 @@ TaCwI4QQQgipCRR2hBBCCCE1gcKOEEIIIaQm/B+ygkKmtEVxSQAAAABJRU5ErkJggg==
 &lt;/div&gt;
 
 &lt;/div&gt;
-&lt;div class="cell border-box-sizing text_cell rendered"&gt;
-&lt;div class="prompt input_prompt"&gt;
+&lt;div class="cell border-box-sizing text_cell rendered"&gt;&lt;div class="prompt input_prompt"&gt;
 &lt;/div&gt;
 &lt;div class="inner_cell"&gt;
 &lt;div class="text_cell_render border-box-sizing rendered_html"&gt;
@@ -2962,7 +4226,11 @@ TaCwI4QQQgipCRR2hBBCCCE1gcKOEEIIIaQm/B+ygkKmtEVxSQAAAABJRU5ErkJggg==
 &lt;div class="output"&gt;
 
 
-&lt;div class="output_area"&gt;&lt;div class="prompt"&gt;&lt;/div&gt;
+&lt;div class="output_area"&gt;
+
+&lt;div class="prompt"&gt;&lt;/div&gt;
+
+
 &lt;div class="output_subarea output_stream output_stdout output_text"&gt;
 &lt;pre class="ipynb"&gt;[ True  True  True  True  True  True  True  True  True  True]
 [False False False False False False False False False False]
@@ -2974,8 +4242,7 @@ TaCwI4QQQgipCRR2hBBCCCE1gcKOEEIIIaQm/B+ygkKmtEVxSQAAAABJRU5ErkJggg==
 &lt;/div&gt;
 
 &lt;/div&gt;
-&lt;div class="cell border-box-sizing text_cell rendered"&gt;
-&lt;div class="prompt input_prompt"&gt;
+&lt;div class="cell border-box-sizing text_cell rendered"&gt;&lt;div class="prompt input_prompt"&gt;
 &lt;/div&gt;
 &lt;div class="inner_cell"&gt;
 &lt;div class="text_cell_render border-box-sizing rendered_html"&gt;
@@ -3008,7 +4275,11 @@ TaCwI4QQQgipCRR2hBBCCCE1gcKOEEIIIaQm/B+ygkKmtEVxSQAAAABJRU5ErkJggg==
 &lt;div class="output"&gt;
 
 
-&lt;div class="output_area"&gt;&lt;div class="prompt"&gt;&lt;/div&gt;
+&lt;div class="output_area"&gt;
+
+&lt;div class="prompt"&gt;&lt;/div&gt;
+
+
 &lt;div class="output_subarea output_stream output_stdout output_text"&gt;
 &lt;pre class="ipynb"&gt;[ True  True False  True]
 [ True  True  True False]
@@ -3020,8 +4291,7 @@ TaCwI4QQQgipCRR2hBBCCCE1gcKOEEIIIaQm/B+ygkKmtEVxSQAAAABJRU5ErkJggg==
 &lt;/div&gt;
 
 &lt;/div&gt;
-&lt;div class="cell border-box-sizing text_cell rendered"&gt;
-&lt;div class="prompt input_prompt"&gt;
+&lt;div class="cell border-box-sizing text_cell rendered"&gt;&lt;div class="prompt input_prompt"&gt;
 &lt;/div&gt;
 &lt;div class="inner_cell"&gt;
 &lt;div class="text_cell_render border-box-sizing rendered_html"&gt;
@@ -3048,7 +4318,11 @@ TaCwI4QQQgipCRR2hBBCCCE1gcKOEEIIIaQm/B+ygkKmtEVxSQAAAABJRU5ErkJggg==
 &lt;div class="output"&gt;
 
 
-&lt;div class="output_area"&gt;&lt;div class="prompt"&gt;&lt;/div&gt;
+&lt;div class="output_area"&gt;
+
+&lt;div class="prompt"&gt;&lt;/div&gt;
+
+
 &lt;div class="output_subarea output_text output_error"&gt;
 &lt;pre class="ipynb"&gt;&lt;div class="output_subarea output_text output_error"&gt;
 &lt;pre&gt;
@@ -3066,8 +4340,7 @@ TaCwI4QQQgipCRR2hBBCCCE1gcKOEEIIIaQm/B+ygkKmtEVxSQAAAABJRU5ErkJggg==
 &lt;/div&gt;
 
 &lt;/div&gt;
-&lt;div class="cell border-box-sizing text_cell rendered"&gt;
-&lt;div class="prompt input_prompt"&gt;
+&lt;div class="cell border-box-sizing text_cell rendered"&gt;&lt;div class="prompt input_prompt"&gt;
 &lt;/div&gt;
 &lt;div class="inner_cell"&gt;
 &lt;div class="text_cell_render border-box-sizing rendered_html"&gt;
@@ -3099,7 +4372,11 @@ TaCwI4QQQgipCRR2hBBCCCE1gcKOEEIIIaQm/B+ygkKmtEVxSQAAAABJRU5ErkJggg==
 &lt;div class="output"&gt;
 
 
-&lt;div class="output_area"&gt;&lt;div class="prompt"&gt;&lt;/div&gt;
+&lt;div class="output_area"&gt;
+
+&lt;div class="prompt"&gt;&lt;/div&gt;
+
+
 &lt;div class="output_subarea output_stream output_stdout output_text"&gt;
 &lt;pre class="ipynb"&gt;Array a
 [ True  True  True  True  True  True  True  True  True  True]
@@ -3116,8 +4393,7 @@ Array b
 &lt;/div&gt;
 
 &lt;/div&gt;
-&lt;div class="cell border-box-sizing text_cell rendered"&gt;
-&lt;div class="prompt input_prompt"&gt;
+&lt;div class="cell border-box-sizing text_cell rendered"&gt;&lt;div class="prompt input_prompt"&gt;
 &lt;/div&gt;
 &lt;div class="inner_cell"&gt;
 &lt;div class="text_cell_render border-box-sizing rendered_html"&gt;
@@ -3126,9 +4402,17 @@ Array b
 
 &lt;/div&gt;
 &lt;/div&gt;
-&lt;/div&gt;&lt;/p&gt;</summary><category term="python"></category><category term="numpy"></category><category term="scientific computing"></category></entry><entry><title>Convergence of the Affine Invariant Ensemble Sampler</title><link href="http://joergdietrich.github.io/emcee-convergence.html" rel="alternate"></link><updated>2016-06-20T00:00:00+02:00</updated><author><name>Jörg Dietrich</name></author><id>tag:joergdietrich.github.io,2016-06-20:emcee-convergence.html</id><summary type="html">&lt;p&gt;
-&lt;div class="cell border-box-sizing text_cell rendered"&gt;
-&lt;div class="prompt input_prompt"&gt;
+&lt;/div&gt;
+ 
+
+&lt;/p&gt;</content><category term="python"></category><category term="numpy"></category><category term="scientific computing"></category></entry><entry><title>Convergence of the Affine Invariant Ensemble Sampler</title><link href="http://joergdietrich.github.io/emcee-convergence.html" rel="alternate"></link><published>2016-06-20T00:00:00+02:00</published><updated>2016-06-20T00:00:00+02:00</updated><author><name>Jörg Dietrich</name></author><id>tag:joergdietrich.github.io,2016-06-20:/emcee-convergence.html</id><summary type="html">&lt;p&gt;
+&lt;div class="cell border-box-sizing text_cell rendered"&gt;&lt;div class="prompt input_prompt"&gt;
+&lt;/div&gt;
+&lt;div class="inner_cell"&gt;
+&lt;div class="text_cell_render border-box-sizing rendered_html"&gt;
+&lt;p&gt;The Affine-Invariant Ensemble Sampler (&lt;span class="caps"&gt;AIES&lt;/span&gt;) is a Monte-Carlo method particularly popular in astrophysics. The paper describing its widely used Python implementation &lt;a href="http://dan.iel.fm/emcee/"&gt;emcee&lt;/a&gt; is highly cited and the method is particularly popular because it has &amp;#8212; aside from the number of walkers, i.e., the number of chains &amp;#8212; no tunable&amp;nbsp;parameters.&lt;/p&gt;
+&lt;p&gt;Huijser …&lt;/p&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;/p&gt;</summary><content type="html">&lt;p&gt;
+&lt;div class="cell border-box-sizing text_cell rendered"&gt;&lt;div class="prompt input_prompt"&gt;
 &lt;/div&gt;
 &lt;div class="inner_cell"&gt;
 &lt;div class="text_cell_render border-box-sizing rendered_html"&gt;
@@ -3159,8 +4443,7 @@ Array b
 &lt;/div&gt;
 
 &lt;/div&gt;
-&lt;div class="cell border-box-sizing text_cell rendered"&gt;
-&lt;div class="prompt input_prompt"&gt;
+&lt;div class="cell border-box-sizing text_cell rendered"&gt;&lt;div class="prompt input_prompt"&gt;
 &lt;/div&gt;
 &lt;div class="inner_cell"&gt;
 &lt;div class="text_cell_render border-box-sizing rendered_html"&gt;
@@ -3190,8 +4473,7 @@ Array b
 &lt;/div&gt;
 
 &lt;/div&gt;
-&lt;div class="cell border-box-sizing text_cell rendered"&gt;
-&lt;div class="prompt input_prompt"&gt;
+&lt;div class="cell border-box-sizing text_cell rendered"&gt;&lt;div class="prompt input_prompt"&gt;
 &lt;/div&gt;
 &lt;div class="inner_cell"&gt;
 &lt;div class="text_cell_render border-box-sizing rendered_html"&gt;
@@ -3219,7 +4501,11 @@ Array b
 &lt;div class="output"&gt;
 
 
-&lt;div class="output_area"&gt;&lt;div class="prompt"&gt;&lt;/div&gt;
+&lt;div class="output_area"&gt;
+
+&lt;div class="prompt"&gt;&lt;/div&gt;
+
+
 
 
 &lt;div class="output_png output_subarea "&gt;
@@ -16984,8 +18270,7 @@ RU5ErkJggg==
 &lt;/div&gt;
 
 &lt;/div&gt;
-&lt;div class="cell border-box-sizing text_cell rendered"&gt;
-&lt;div class="prompt input_prompt"&gt;
+&lt;div class="cell border-box-sizing text_cell rendered"&gt;&lt;div class="prompt input_prompt"&gt;
 &lt;/div&gt;
 &lt;div class="inner_cell"&gt;
 &lt;div class="text_cell_render border-box-sizing rendered_html"&gt;
@@ -17039,7 +18324,11 @@ RU5ErkJggg==
 &lt;div class="output"&gt;
 
 
-&lt;div class="output_area"&gt;&lt;div class="prompt"&gt;&lt;/div&gt;
+&lt;div class="output_area"&gt;
+
+&lt;div class="prompt"&gt;&lt;/div&gt;
+
+
 &lt;div class="output_subarea output_stream output_stdout output_text"&gt;
 &lt;pre class="ipynb"&gt;ndim	μ		σ	acceptance fraction
 ===================================================
@@ -17054,8 +18343,7 @@ RU5ErkJggg==
 &lt;/div&gt;
 
 &lt;/div&gt;
-&lt;div class="cell border-box-sizing text_cell rendered"&gt;
-&lt;div class="prompt input_prompt"&gt;
+&lt;div class="cell border-box-sizing text_cell rendered"&gt;&lt;div class="prompt input_prompt"&gt;
 &lt;/div&gt;
 &lt;div class="inner_cell"&gt;
 &lt;div class="text_cell_render border-box-sizing rendered_html"&gt;
@@ -17064,13 +18352,13 @@ RU5ErkJggg==
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;/div&gt;
-&lt;div class="cell border-box-sizing text_cell rendered"&gt;
-&lt;div class="prompt input_prompt"&gt;
+&lt;div class="cell border-box-sizing text_cell rendered"&gt;&lt;div class="prompt input_prompt"&gt;
 &lt;/div&gt;
 &lt;div class="inner_cell"&gt;
 &lt;div class="text_cell_render border-box-sizing rendered_html"&gt;
 &lt;h2 id="The-Gelman-Rubin-Test"&gt;The Gelman-Rubin Test&lt;a class="anchor-link" href="#The-Gelman-Rubin-Test"&gt;&amp;#182;&lt;/a&gt;&lt;/h2&gt;&lt;p&gt;Huijser et al. do not go into attempts to test convergence criteria that can detect this behavior. Because the slow convergence is highlighted in the low variance of the chains, the Gelman-Rubin test is a natural approach. First proposed by &lt;a href="http://www.stat.columbia.edu/~gelman/research/published/itsim.pdf"&gt;Gelman and Rubin in 1992&lt;/a&gt;, this test compares the variance within one chain, $W$, with the variance between chains $B$. Both variances are combined in a weighted sum to obtain an estimate of the variance of a parameter $\theta$. The square root of the ratio of this estimates variance to the within chain&amp;nbsp;variance&lt;/p&gt;
-$$\hat R = \sqrt{\frac{\hat{\mathrm{Var}}(\theta)}{W}}$$&lt;p&gt;is called the potential scale reduction. For a well converged chain it should approach 1. Values greater than typically 1.1 indicate that the chains have not yet fully&amp;nbsp;converged.&lt;/p&gt;
+&lt;p&gt;$$\hat R =&amp;nbsp;\sqrt{\frac{\hat{\mathrm{Var}}(\theta)}{W}}$$&lt;/p&gt;
+&lt;p&gt;is called the potential scale reduction. For a well converged chain it should approach 1. Values greater than typically 1.1 indicate that the chains have not yet fully&amp;nbsp;converged.&lt;/p&gt;
 &lt;p&gt;The Gelman-Rubin criterion can be naturally applied to multi-chain methods such as &lt;span class="caps"&gt;AIES&lt;/span&gt;. Although the walkers in &lt;span class="caps"&gt;AIES&lt;/span&gt; communicate at every step, the target distribution is composed of independent walkers and the Gelman-Rubin test is&amp;nbsp;applicable.&lt;/p&gt;
 
 &lt;/div&gt;
@@ -17101,8 +18389,7 @@ $$\hat R = \sqrt{\frac{\hat{\mathrm{Var}}(\theta)}{W}}$$&lt;p&gt;is called the p
 &lt;/div&gt;
 
 &lt;/div&gt;
-&lt;div class="cell border-box-sizing text_cell rendered"&gt;
-&lt;div class="prompt input_prompt"&gt;
+&lt;div class="cell border-box-sizing text_cell rendered"&gt;&lt;div class="prompt input_prompt"&gt;
 &lt;/div&gt;
 &lt;div class="inner_cell"&gt;
 &lt;div class="text_cell_render border-box-sizing rendered_html"&gt;
@@ -17136,7 +18423,11 @@ $$\hat R = \sqrt{\frac{\hat{\mathrm{Var}}(\theta)}{W}}$$&lt;p&gt;is called the p
 &lt;div class="output"&gt;
 
 
-&lt;div class="output_area"&gt;&lt;div class="prompt"&gt;&lt;/div&gt;
+&lt;div class="output_area"&gt;
+
+&lt;div class="prompt"&gt;&lt;/div&gt;
+
+
 &lt;div class="output_subarea output_stream output_stdout output_text"&gt;
 &lt;pre class="ipynb"&gt;ndim	μ		σ	Gelman-Rubin
 ============================================
@@ -17151,8 +18442,7 @@ $$\hat R = \sqrt{\frac{\hat{\mathrm{Var}}(\theta)}{W}}$$&lt;p&gt;is called the p
 &lt;/div&gt;
 
 &lt;/div&gt;
-&lt;div class="cell border-box-sizing text_cell rendered"&gt;
-&lt;div class="prompt input_prompt"&gt;
+&lt;div class="cell border-box-sizing text_cell rendered"&gt;&lt;div class="prompt input_prompt"&gt;
 &lt;/div&gt;
 &lt;div class="inner_cell"&gt;
 &lt;div class="text_cell_render border-box-sizing rendered_html"&gt;
@@ -17193,7 +18483,11 @@ $$\hat R = \sqrt{\frac{\hat{\mathrm{Var}}(\theta)}{W}}$$&lt;p&gt;is called the p
 &lt;div class="output"&gt;
 
 
-&lt;div class="output_area"&gt;&lt;div class="prompt"&gt;&lt;/div&gt;
+&lt;div class="output_area"&gt;
+
+&lt;div class="prompt"&gt;&lt;/div&gt;
+
+
 
 
 &lt;div class="output_png output_subarea "&gt;
@@ -17659,19 +18953,17 @@ PgW8g9sO5Ewp8yUiq0sBkIiIiGw5GgMkIiIiW44CIBEREdlyFACJiIjIlqMASERERLYcBUAiIiKy
 &lt;/div&gt;
 
 &lt;/div&gt;
-&lt;div class="cell border-box-sizing text_cell rendered"&gt;
-&lt;div class="prompt input_prompt"&gt;
+&lt;div class="cell border-box-sizing text_cell rendered"&gt;&lt;div class="prompt input_prompt"&gt;
 &lt;/div&gt;
 &lt;div class="inner_cell"&gt;
 &lt;div class="text_cell_render border-box-sizing rendered_html"&gt;
-&lt;p&gt;The 10 dimensional case crosses our convergence criterion of $\hat R &lt; 1.1$ after a relatively short run of about 1100 steps after burn-in while the higher dimensional cases creep towards convergence at a rate that can only be described as unsatisfactory given how simple this problem&amp;nbsp;is.&lt;/p&gt;
+&lt;p&gt;The 10 dimensional case crosses our convergence criterion of $\hat R &amp;lt; 1.1$ after a relatively short run of about 1100 steps after burn-in while the higher dimensional cases creep towards convergence at a rate that can only be described as unsatisfactory given how simple this problem&amp;nbsp;is.&lt;/p&gt;
 &lt;h2 id="Conclusions"&gt;Conclusions&lt;a class="anchor-link" href="#Conclusions"&gt;&amp;#182;&lt;/a&gt;&lt;/h2&gt;&lt;p&gt;While this blog post doesn&amp;#8217;t solve the slow convergence of &lt;span class="caps"&gt;AIES&lt;/span&gt; in cases like this one it shows that a simple and well established convergence criterion, the Gelman-Rubin test, can easily discover such problematic behavior. The Gelman-Rubin test should thus be an essential step in ascertaining the convergence of chains from the &lt;span class="caps"&gt;AIES&lt;/span&gt;. Reliance on trace plots and autocorrelation lengths is not&amp;nbsp;sufficient.&lt;/p&gt;
 
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;/div&gt;
-&lt;div class="cell border-box-sizing text_cell rendered"&gt;
-&lt;div class="prompt input_prompt"&gt;
+&lt;div class="cell border-box-sizing text_cell rendered"&gt;&lt;div class="prompt input_prompt"&gt;
 &lt;/div&gt;
 &lt;div class="inner_cell"&gt;
 &lt;div class="text_cell_render border-box-sizing rendered_html"&gt;
@@ -17680,9 +18972,31 @@ PgW8g9sO5Ewp8yUiq0sBkIiIiGw5GgMkIiIiW44CIBEREdlyFACJiIjIlqMASERERLYcBUAiIiKy
 
 &lt;/div&gt;
 &lt;/div&gt;
-&lt;/div&gt;&lt;/p&gt;</summary><category term="python"></category><category term="emcee"></category><category term="scientific computing"></category><category term="monte carlo"></category></entry><entry><title>Fun with Floating Point Precision in numpy</title><link href="http://joergdietrich.github.io/floating-point-fun.html" rel="alternate"></link><updated>2016-02-17T00:00:00+01:00</updated><author><name>Jörg Dietrich</name></author><id>tag:joergdietrich.github.io,2016-02-17:floating-point-fun.html</id><summary type="html">&lt;p&gt;
-&lt;div class="cell border-box-sizing text_cell rendered"&gt;
-&lt;div class="prompt input_prompt"&gt;
+&lt;/div&gt;
+ 
+
+&lt;/p&gt;</content><category term="python"></category><category term="emcee"></category><category term="scientific computing"></category><category term="monte carlo"></category></entry><entry><title>Fun with Floating Point Precision in numpy</title><link href="http://joergdietrich.github.io/floating-point-fun.html" rel="alternate"></link><published>2016-02-17T00:00:00+01:00</published><updated>2016-02-17T00:00:00+01:00</updated><author><name>Jörg Dietrich</name></author><id>tag:joergdietrich.github.io,2016-02-17:/floating-point-fun.html</id><summary type="html">&lt;p&gt;
+&lt;div class="cell border-box-sizing text_cell rendered"&gt;&lt;div class="prompt input_prompt"&gt;
+&lt;/div&gt;
+&lt;div class="inner_cell"&gt;
+&lt;div class="text_cell_render border-box-sizing rendered_html"&gt;
+&lt;p&gt;I recently had a bug in my code that obviously was caused by an issue with floating point precision but had me scratching my head how it came about. Here it&amp;nbsp;is:&lt;/p&gt;
+
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="cell border-box-sizing code_cell rendered"&gt;
+&lt;div class="input"&gt;
+&lt;div class="prompt input_prompt"&gt;In&amp;nbsp;[1]:&lt;/div&gt;
+
+&lt;div class="inner_cell"&gt;
+    &lt;div class="input_area"&gt;
+        &lt;div class=" highlight hl-ipython3"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="nn"&gt;numpy&lt;/span&gt; &lt;span class="k"&gt;as&lt;/span&gt; &lt;span class="nn"&gt;np&lt;/span&gt;
+&lt;span class="kn"&gt;from&lt;/span&gt; &lt;span class="nn"&gt;astropy.table&lt;/span&gt; &lt;span class="k"&gt;import&lt;/span&gt; &lt;span class="n"&gt;Table&lt;/span&gt;
+&lt;span class="kn"&gt;from&lt;/span&gt; &lt;span class="nn"&gt;astropy&lt;/span&gt; &lt;span class="k"&gt;import&lt;/span&gt; &lt;span class="n"&gt;cosmology&lt;/span&gt;
+
+&lt;span class="n"&gt;cosmo&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;cosmology&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;WMAP9 …&lt;/span&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;/p&gt;</summary><content type="html">&lt;p&gt;
+&lt;div class="cell border-box-sizing text_cell rendered"&gt;&lt;div class="prompt input_prompt"&gt;
 &lt;/div&gt;
 &lt;div class="inner_cell"&gt;
 &lt;div class="text_cell_render border-box-sizing rendered_html"&gt;
@@ -17710,8 +19024,7 @@ PgW8g9sO5Ewp8yUiq0sBkIiIiGw5GgMkIiIiW44CIBEREdlyFACJiIjIlqMASERERLYcBUAiIiKy
 &lt;/div&gt;
 
 &lt;/div&gt;
-&lt;div class="cell border-box-sizing text_cell rendered"&gt;
-&lt;div class="prompt input_prompt"&gt;
+&lt;div class="cell border-box-sizing text_cell rendered"&gt;&lt;div class="prompt input_prompt"&gt;
 &lt;/div&gt;
 &lt;div class="inner_cell"&gt;
 &lt;div class="text_cell_render border-box-sizing rendered_html"&gt;
@@ -17739,7 +19052,11 @@ PgW8g9sO5Ewp8yUiq0sBkIiIiGw5GgMkIiIiW44CIBEREdlyFACJiIjIlqMASERERLYcBUAiIiKy
 &lt;div class="output"&gt;
 
 
-&lt;div class="output_area"&gt;&lt;div class="prompt"&gt;&lt;/div&gt;
+&lt;div class="output_area"&gt;
+
+&lt;div class="prompt"&gt;&lt;/div&gt;
+
+
 &lt;div class="output_subarea output_stream output_stdout output_text"&gt;
 &lt;pre class="ipynb"&gt;Downloading https://github.com/joergdietrich/joergdietrich.github.io/raw/master/data/float.fits [Done]
 &lt;/pre&gt;
@@ -17750,8 +19067,7 @@ PgW8g9sO5Ewp8yUiq0sBkIiIiGw5GgMkIiIiW44CIBEREdlyFACJiIjIlqMASERERLYcBUAiIiKy
 &lt;/div&gt;
 
 &lt;/div&gt;
-&lt;div class="cell border-box-sizing text_cell rendered"&gt;
-&lt;div class="prompt input_prompt"&gt;
+&lt;div class="cell border-box-sizing text_cell rendered"&gt;&lt;div class="prompt input_prompt"&gt;
 &lt;/div&gt;
 &lt;div class="inner_cell"&gt;
 &lt;div class="text_cell_render border-box-sizing rendered_html"&gt;
@@ -17781,7 +19097,11 @@ PgW8g9sO5Ewp8yUiq0sBkIiIiGw5GgMkIiIiW44CIBEREdlyFACJiIjIlqMASERERLYcBUAiIiKy
 &lt;div class="output"&gt;
 
 
-&lt;div class="output_area"&gt;&lt;div class="prompt output_prompt"&gt;Out[3]:&lt;/div&gt;
+&lt;div class="output_area"&gt;
+
+&lt;div class="prompt output_prompt"&gt;Out[3]:&lt;/div&gt;
+
+
 
 
 &lt;div class="output_text output_subarea output_execute_result"&gt;
@@ -17794,8 +19114,7 @@ PgW8g9sO5Ewp8yUiq0sBkIiIiGw5GgMkIiIiW44CIBEREdlyFACJiIjIlqMASERERLYcBUAiIiKy
 &lt;/div&gt;
 
 &lt;/div&gt;
-&lt;div class="cell border-box-sizing text_cell rendered"&gt;
-&lt;div class="prompt input_prompt"&gt;
+&lt;div class="cell border-box-sizing text_cell rendered"&gt;&lt;div class="prompt input_prompt"&gt;
 &lt;/div&gt;
 &lt;div class="inner_cell"&gt;
 &lt;div class="text_cell_render border-box-sizing rendered_html"&gt;
@@ -17822,7 +19141,11 @@ PgW8g9sO5Ewp8yUiq0sBkIiIiGw5GgMkIiIiW44CIBEREdlyFACJiIjIlqMASERERLYcBUAiIiKy
 &lt;div class="output"&gt;
 
 
-&lt;div class="output_area"&gt;&lt;div class="prompt"&gt;&lt;/div&gt;
+&lt;div class="output_area"&gt;
+
+&lt;div class="prompt"&gt;&lt;/div&gt;
+
+
 &lt;div class="output_subarea output_text output_error"&gt;
 &lt;pre class="ipynb"&gt;&lt;div class="output_subarea output_text output_error"&gt;
 &lt;pre&gt;
@@ -17847,8 +19170,7 @@ PgW8g9sO5Ewp8yUiq0sBkIiIiGw5GgMkIiIiW44CIBEREdlyFACJiIjIlqMASERERLYcBUAiIiKy
 &lt;/div&gt;
 
 &lt;/div&gt;
-&lt;div class="cell border-box-sizing text_cell rendered"&gt;
-&lt;div class="prompt input_prompt"&gt;
+&lt;div class="cell border-box-sizing text_cell rendered"&gt;&lt;div class="prompt input_prompt"&gt;
 &lt;/div&gt;
 &lt;div class="inner_cell"&gt;
 &lt;div class="text_cell_render border-box-sizing rendered_html"&gt;
@@ -17875,7 +19197,11 @@ PgW8g9sO5Ewp8yUiq0sBkIiIiGw5GgMkIiIiW44CIBEREdlyFACJiIjIlqMASERERLYcBUAiIiKy
 &lt;div class="output"&gt;
 
 
-&lt;div class="output_area"&gt;&lt;div class="prompt output_prompt"&gt;Out[5]:&lt;/div&gt;
+&lt;div class="output_area"&gt;
+
+&lt;div class="prompt output_prompt"&gt;Out[5]:&lt;/div&gt;
+
+
 
 
 &lt;div class="output_text output_subarea output_execute_result"&gt;
@@ -17888,8 +19214,7 @@ PgW8g9sO5Ewp8yUiq0sBkIiIiGw5GgMkIiIiW44CIBEREdlyFACJiIjIlqMASERERLYcBUAiIiKy
 &lt;/div&gt;
 
 &lt;/div&gt;
-&lt;div class="cell border-box-sizing text_cell rendered"&gt;
-&lt;div class="prompt input_prompt"&gt;
+&lt;div class="cell border-box-sizing text_cell rendered"&gt;&lt;div class="prompt input_prompt"&gt;
 &lt;/div&gt;
 &lt;div class="inner_cell"&gt;
 &lt;div class="text_cell_render border-box-sizing rendered_html"&gt;
@@ -17917,7 +19242,11 @@ PgW8g9sO5Ewp8yUiq0sBkIiIiGw5GgMkIiIiW44CIBEREdlyFACJiIjIlqMASERERLYcBUAiIiKy
 &lt;div class="output"&gt;
 
 
-&lt;div class="output_area"&gt;&lt;div class="prompt output_prompt"&gt;Out[7]:&lt;/div&gt;
+&lt;div class="output_area"&gt;
+
+&lt;div class="prompt output_prompt"&gt;Out[7]:&lt;/div&gt;
+
+
 
 
 &lt;div class="output_text output_subarea output_execute_result"&gt;
@@ -17930,8 +19259,7 @@ PgW8g9sO5Ewp8yUiq0sBkIiIiGw5GgMkIiIiW44CIBEREdlyFACJiIjIlqMASERERLYcBUAiIiKy
 &lt;/div&gt;
 
 &lt;/div&gt;
-&lt;div class="cell border-box-sizing text_cell rendered"&gt;
-&lt;div class="prompt input_prompt"&gt;
+&lt;div class="cell border-box-sizing text_cell rendered"&gt;&lt;div class="prompt input_prompt"&gt;
 &lt;/div&gt;
 &lt;div class="inner_cell"&gt;
 &lt;div class="text_cell_render border-box-sizing rendered_html"&gt;
@@ -17958,7 +19286,11 @@ PgW8g9sO5Ewp8yUiq0sBkIiIiGw5GgMkIiIiW44CIBEREdlyFACJiIjIlqMASERERLYcBUAiIiKy
 &lt;div class="output"&gt;
 
 
-&lt;div class="output_area"&gt;&lt;div class="prompt output_prompt"&gt;Out[8]:&lt;/div&gt;
+&lt;div class="output_area"&gt;
+
+&lt;div class="prompt output_prompt"&gt;Out[8]:&lt;/div&gt;
+
+
 
 
 &lt;div class="output_text output_subarea output_execute_result"&gt;
@@ -17986,8 +19318,7 @@ PgW8g9sO5Ewp8yUiq0sBkIiIiGw5GgMkIiIiW44CIBEREdlyFACJiIjIlqMASERERLYcBUAiIiKy
 &lt;/div&gt;
 
 &lt;/div&gt;
-&lt;div class="cell border-box-sizing text_cell rendered"&gt;
-&lt;div class="prompt input_prompt"&gt;
+&lt;div class="cell border-box-sizing text_cell rendered"&gt;&lt;div class="prompt input_prompt"&gt;
 &lt;/div&gt;
 &lt;div class="inner_cell"&gt;
 &lt;div class="text_cell_render border-box-sizing rendered_html"&gt;
@@ -18016,7 +19347,11 @@ PgW8g9sO5Ewp8yUiq0sBkIiIiGw5GgMkIiIiW44CIBEREdlyFACJiIjIlqMASERERLYcBUAiIiKy
 &lt;div class="output"&gt;
 
 
-&lt;div class="output_area"&gt;&lt;div class="prompt output_prompt"&gt;Out[9]:&lt;/div&gt;
+&lt;div class="output_area"&gt;
+
+&lt;div class="prompt output_prompt"&gt;Out[9]:&lt;/div&gt;
+
+
 
 
 &lt;div class="output_text output_subarea output_execute_result"&gt;
@@ -18029,8 +19364,7 @@ PgW8g9sO5Ewp8yUiq0sBkIiIiGw5GgMkIiIiW44CIBEREdlyFACJiIjIlqMASERERLYcBUAiIiKy
 &lt;/div&gt;
 
 &lt;/div&gt;
-&lt;div class="cell border-box-sizing text_cell rendered"&gt;
-&lt;div class="prompt input_prompt"&gt;
+&lt;div class="cell border-box-sizing text_cell rendered"&gt;&lt;div class="prompt input_prompt"&gt;
 &lt;/div&gt;
 &lt;div class="inner_cell"&gt;
 &lt;div class="text_cell_render border-box-sizing rendered_html"&gt;
@@ -18040,9 +19374,17 @@ PgW8g9sO5Ewp8yUiq0sBkIiIiGw5GgMkIiIiW44CIBEREdlyFACJiIjIlqMASERERLYcBUAiIiKy
 
 &lt;/div&gt;
 &lt;/div&gt;
-&lt;/div&gt;&lt;/p&gt;</summary><category term="python"></category><category term="numpy"></category><category term="astropy"></category><category term="scientific computing"></category></entry><entry><title>Are Theorists Smarter Than Observers?</title><link href="http://joergdietrich.github.io/are-theorists-smarter.html" rel="alternate"></link><updated>2015-02-17T00:00:00+01:00</updated><author><name>Jörg Dietrich</name></author><id>tag:joergdietrich.github.io,2015-02-17:are-theorists-smarter.html</id><summary type="html">&lt;p&gt;
-&lt;div class="cell border-box-sizing text_cell rendered"&gt;
-&lt;div class="prompt input_prompt"&gt;
+&lt;/div&gt;
+ 
+
+&lt;/p&gt;</content><category term="python"></category><category term="numpy"></category><category term="astropy"></category><category term="scientific computing"></category></entry><entry><title>Are Theorists Smarter Than Observers?</title><link href="http://joergdietrich.github.io/are-theorists-smarter.html" rel="alternate"></link><published>2015-02-17T00:00:00+01:00</published><updated>2015-02-17T00:00:00+01:00</updated><author><name>Jörg Dietrich</name></author><id>tag:joergdietrich.github.io,2015-02-17:/are-theorists-smarter.html</id><summary type="html">&lt;p&gt;
+
+
+
+
+&lt;p&gt;While working through the close to 250 applications for PhD positions at the International Max Planck Research School (&lt;span class="caps"&gt;IMPRS&lt;/span&gt;) for Astrophysics&lt;a href="#fn1" name="fr1"&gt;&lt;sup&gt;1&lt;/sup&gt;&lt;/a&gt; for the current round of applications, I noticed an odd pattern: Reference letter writers who saw a candidates strengths more in theory than in experiment seemed to rank these students higher compared to those whose strengths are more in&amp;nbsp;experiment.&lt;/p&gt;
+</summary><content type="html">&lt;p&gt;
+&lt;div class="cell border-box-sizing text_cell rendered"&gt;&lt;div class="prompt input_prompt"&gt;
 &lt;/div&gt;
 &lt;div class="inner_cell"&gt;
 &lt;div class="text_cell_render border-box-sizing rendered_html"&gt;
@@ -18083,7 +19425,11 @@ PgW8g9sO5Ewp8yUiq0sBkIiIiGw5GgMkIiIiW44CIBEREdlyFACJiIjIlqMASERERLYcBUAiIiKy
 &lt;div class="output"&gt;
 
 
-&lt;div class="output_area"&gt;&lt;div class="prompt output_prompt"&gt;Out[1]:&lt;/div&gt;
+&lt;div class="output_area"&gt;
+
+&lt;div class="prompt output_prompt"&gt;Out[1]:&lt;/div&gt;
+
+
 
 &lt;div class="output_html rendered_html output_subarea output_execute_result"&gt;
 &lt;div style="max-height:1000px;max-width:1500px;overflow:auto;"&gt;
@@ -18156,8 +19502,7 @@ PgW8g9sO5Ewp8yUiq0sBkIiIiGw5GgMkIiIiW44CIBEREdlyFACJiIjIlqMASERERLYcBUAiIiKy
 &lt;/div&gt;
 
 &lt;/div&gt;
-&lt;div class="cell border-box-sizing text_cell rendered"&gt;
-&lt;div class="prompt input_prompt"&gt;
+&lt;div class="cell border-box-sizing text_cell rendered"&gt;&lt;div class="prompt input_prompt"&gt;
 &lt;/div&gt;
 &lt;div class="inner_cell"&gt;
 &lt;div class="text_cell_render border-box-sizing rendered_html"&gt;
@@ -18199,7 +19544,11 @@ PgW8g9sO5Ewp8yUiq0sBkIiIiGw5GgMkIiIiW44CIBEREdlyFACJiIjIlqMASERERLYcBUAiIiKy
 &lt;div class="output"&gt;
 
 
-&lt;div class="output_area"&gt;&lt;div class="prompt output_prompt"&gt;Out[2]:&lt;/div&gt;
+&lt;div class="output_area"&gt;
+
+&lt;div class="prompt output_prompt"&gt;Out[2]:&lt;/div&gt;
+
+
 
 &lt;div class="output_html rendered_html output_subarea output_execute_result"&gt;
 &lt;div style="max-height:1000px;max-width:1500px;overflow:auto;"&gt;
@@ -18230,7 +19579,11 @@ PgW8g9sO5Ewp8yUiq0sBkIiIiGw5GgMkIiIiW44CIBEREdlyFACJiIjIlqMASERERLYcBUAiIiKy
 
 &lt;/div&gt;
 
-&lt;div class="output_area"&gt;&lt;div class="prompt"&gt;&lt;/div&gt;
+&lt;div class="output_area"&gt;
+
+&lt;div class="prompt"&gt;&lt;/div&gt;
+
+
 
 &lt;div class="output_svg output_subarea "&gt;
 &lt;?xml version="1.0" encoding="utf-8" standalone="no"?&gt;
@@ -19117,8 +20470,7 @@ z
 &lt;/div&gt;
 
 &lt;/div&gt;
-&lt;div class="cell border-box-sizing text_cell rendered"&gt;
-&lt;div class="prompt input_prompt"&gt;
+&lt;div class="cell border-box-sizing text_cell rendered"&gt;&lt;div class="prompt input_prompt"&gt;
 &lt;/div&gt;
 &lt;div class="inner_cell"&gt;
 &lt;div class="text_cell_render border-box-sizing rendered_html"&gt;
@@ -19176,7 +20528,11 @@ z
 &lt;div class="output"&gt;
 
 
-&lt;div class="output_area"&gt;&lt;div class="prompt"&gt;&lt;/div&gt;
+&lt;div class="output_area"&gt;
+
+&lt;div class="prompt"&gt;&lt;/div&gt;
+
+
 
 &lt;div class="output_svg output_subarea "&gt;
 &lt;?xml version="1.0" encoding="utf-8" standalone="no"?&gt;
@@ -20060,8 +21416,7 @@ L48.8811 11.6278" style="fill:none;stroke:#262626;stroke-linecap:square;stroke-l
 &lt;/div&gt;
 
 &lt;/div&gt;
-&lt;div class="cell border-box-sizing text_cell rendered"&gt;
-&lt;div class="prompt input_prompt"&gt;
+&lt;div class="cell border-box-sizing text_cell rendered"&gt;&lt;div class="prompt input_prompt"&gt;
 &lt;/div&gt;
 &lt;div class="inner_cell"&gt;
 &lt;div class="text_cell_render border-box-sizing rendered_html"&gt;
@@ -20127,7 +21482,11 @@ L48.8811 11.6278" style="fill:none;stroke:#262626;stroke-linecap:square;stroke-l
 &lt;div class="output"&gt;
 
 
-&lt;div class="output_area"&gt;&lt;div class="prompt output_prompt"&gt;Out[4]:&lt;/div&gt;
+&lt;div class="output_area"&gt;
+
+&lt;div class="prompt output_prompt"&gt;Out[4]:&lt;/div&gt;
+
+
 
 &lt;div class="output_html rendered_html output_subarea output_execute_result"&gt;
 &lt;div style="max-height:1000px;max-width:1500px;overflow:auto;"&gt;
@@ -20162,7 +21521,11 @@ L48.8811 11.6278" style="fill:none;stroke:#262626;stroke-linecap:square;stroke-l
 
 &lt;/div&gt;
 
-&lt;div class="output_area"&gt;&lt;div class="prompt"&gt;&lt;/div&gt;
+&lt;div class="output_area"&gt;
+
+&lt;div class="prompt"&gt;&lt;/div&gt;
+
+
 
 &lt;div class="output_svg output_subarea "&gt;
 &lt;?xml version="1.0" encoding="utf-8" standalone="no"?&gt;
@@ -21003,8 +22366,7 @@ L48.8811 11.6278" style="fill:none;stroke:#262626;stroke-linecap:square;stroke-l
 &lt;/div&gt;
 
 &lt;/div&gt;
-&lt;div class="cell border-box-sizing text_cell rendered"&gt;
-&lt;div class="prompt input_prompt"&gt;
+&lt;div class="cell border-box-sizing text_cell rendered"&gt;&lt;div class="prompt input_prompt"&gt;
 &lt;/div&gt;
 &lt;div class="inner_cell"&gt;
 &lt;div class="text_cell_render border-box-sizing rendered_html"&gt;
@@ -21013,8 +22375,7 @@ L48.8811 11.6278" style="fill:none;stroke:#262626;stroke-linecap:square;stroke-l
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;/div&gt;
-&lt;div class="cell border-box-sizing text_cell rendered"&gt;
-&lt;div class="prompt input_prompt"&gt;
+&lt;div class="cell border-box-sizing text_cell rendered"&gt;&lt;div class="prompt input_prompt"&gt;
 &lt;/div&gt;
 &lt;div class="inner_cell"&gt;
 &lt;div class="text_cell_render border-box-sizing rendered_html"&gt;
@@ -21022,8 +22383,7 @@ L48.8811 11.6278" style="fill:none;stroke:#262626;stroke-linecap:square;stroke-l
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;/div&gt;
-&lt;div class="cell border-box-sizing text_cell rendered"&gt;
-&lt;div class="prompt input_prompt"&gt;
+&lt;div class="cell border-box-sizing text_cell rendered"&gt;&lt;div class="prompt input_prompt"&gt;
 &lt;/div&gt;
 &lt;div class="inner_cell"&gt;
 &lt;div class="text_cell_render border-box-sizing rendered_html"&gt;
@@ -21045,8 +22405,7 @@ L48.8811 11.6278" style="fill:none;stroke:#262626;stroke-linecap:square;stroke-l
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;/div&gt;
-&lt;div class="cell border-box-sizing text_cell rendered"&gt;
-&lt;div class="prompt input_prompt"&gt;
+&lt;div class="cell border-box-sizing text_cell rendered"&gt;&lt;div class="prompt input_prompt"&gt;
 &lt;/div&gt;
 &lt;div class="inner_cell"&gt;
 &lt;div class="text_cell_render border-box-sizing rendered_html"&gt;
@@ -21054,8 +22413,7 @@ L48.8811 11.6278" style="fill:none;stroke:#262626;stroke-linecap:square;stroke-l
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;/div&gt;
-&lt;div class="cell border-box-sizing text_cell rendered"&gt;
-&lt;div class="prompt input_prompt"&gt;
+&lt;div class="cell border-box-sizing text_cell rendered"&gt;&lt;div class="prompt input_prompt"&gt;
 &lt;/div&gt;
 &lt;div class="inner_cell"&gt;
 &lt;div class="text_cell_render border-box-sizing rendered_html"&gt;
@@ -21064,9 +22422,18 @@ L48.8811 11.6278" style="fill:none;stroke:#262626;stroke-linecap:square;stroke-l
 
 &lt;/div&gt;
 &lt;/div&gt;
-&lt;/div&gt;&lt;/p&gt;</summary><category term="sociology of science"></category><category term="data analysis"></category></entry><entry><title>Making Your Python Code Look Like Physics Equations</title><link href="http://joergdietrich.github.io/python-physics-equations.html" rel="alternate"></link><updated>2014-03-29T00:00:00+01:00</updated><author><name>Jörg Dietrich</name></author><id>tag:joergdietrich.github.io,2014-03-29:python-physics-equations.html</id><summary type="html">&lt;p&gt;
-&lt;div class="cell border-box-sizing text_cell rendered"&gt;
-&lt;div class="prompt input_prompt"&gt;
+&lt;/div&gt;
+ 
+
+&lt;/p&gt;</content><category term="sociology of science"></category><category term="data analysis"></category></entry><entry><title>Making Your Python Code Look Like Physics Equations</title><link href="http://joergdietrich.github.io/python-physics-equations.html" rel="alternate"></link><published>2014-03-29T00:00:00+01:00</published><updated>2014-03-29T00:00:00+01:00</updated><author><name>Jörg Dietrich</name></author><id>tag:joergdietrich.github.io,2014-03-29:/python-physics-equations.html</id><summary type="html">&lt;p&gt;
+
+
+
+
+&lt;p&gt;I have many reasons to like Python: rapid prototyping, powerful libraries, great interactive tools like the IPython shell and notebook, and the ability to write beautiful code. I will admit, the last one definitely is in the eye of the beholder. &lt;a href="http://rhodesmill.org/brandon/"&gt;Brandon Rhodes&lt;/a&gt; gave a &lt;a href="http://rhodesmill.org/brandon/talks/#python-aesthetic"&gt;good talk&lt;/a&gt; at PyCon Canada a couple of year ago in which he explained what makes Python beautiful to him. One of the points he made, and one that I wholeheartedly agree with, is that you can make Python code look just like the math you are coding up. We know how to write math; we know how to typeset equations so they look beautiful and are easy to read, and thus easier to understand. We can use that knowledge to write more readable Python&amp;nbsp;code.&lt;/p&gt;
+&lt;p&gt;But I&amp;#8217;m not a mathematician, I&amp;#8217;m an astrophysicist. Can I take this further and make my code look like physics, not like math?
+</summary><content type="html">&lt;p&gt;
+&lt;div class="cell border-box-sizing text_cell rendered"&gt;&lt;div class="prompt input_prompt"&gt;
 &lt;/div&gt;
 &lt;div class="inner_cell"&gt;
 &lt;div class="text_cell_render border-box-sizing rendered_html"&gt;
@@ -21103,7 +22470,11 @@ L48.8811 11.6278" style="fill:none;stroke:#262626;stroke-linecap:square;stroke-l
 &lt;div class="output"&gt;
 
 
-&lt;div class="output_area"&gt;&lt;div class="prompt"&gt;&lt;/div&gt;
+&lt;div class="output_area"&gt;
+
+&lt;div class="prompt"&gt;&lt;/div&gt;
+
+
 &lt;div class="output_subarea output_stream output_stdout output_text"&gt;
 &lt;pre class="ipynb"&gt;Critical density at redshift 0: 9.02654646573e-30 g / cm3
 &lt;/pre&gt;
@@ -21114,8 +22485,7 @@ L48.8811 11.6278" style="fill:none;stroke:#262626;stroke-linecap:square;stroke-l
 &lt;/div&gt;
 
 &lt;/div&gt;
-&lt;div class="cell border-box-sizing text_cell rendered"&gt;
-&lt;div class="prompt input_prompt"&gt;
+&lt;div class="cell border-box-sizing text_cell rendered"&gt;&lt;div class="prompt input_prompt"&gt;
 &lt;/div&gt;
 &lt;div class="inner_cell"&gt;
 &lt;div class="text_cell_render border-box-sizing rendered_html"&gt;
@@ -21142,7 +22512,11 @@ L48.8811 11.6278" style="fill:none;stroke:#262626;stroke-linecap:square;stroke-l
 &lt;div class="output"&gt;
 
 
-&lt;div class="output_area"&gt;&lt;div class="prompt"&gt;&lt;/div&gt;
+&lt;div class="output_area"&gt;
+
+&lt;div class="prompt"&gt;&lt;/div&gt;
+
+
 &lt;div class="output_subarea output_stream output_stdout output_text"&gt;
 &lt;pre class="ipynb"&gt;Critical density at redshift 0: 1.33326549709e+11 solMass / Mpc3
 &lt;/pre&gt;
@@ -21153,8 +22527,7 @@ L48.8811 11.6278" style="fill:none;stroke:#262626;stroke-linecap:square;stroke-l
 &lt;/div&gt;
 
 &lt;/div&gt;
-&lt;div class="cell border-box-sizing text_cell rendered"&gt;
-&lt;div class="prompt input_prompt"&gt;
+&lt;div class="cell border-box-sizing text_cell rendered"&gt;&lt;div class="prompt input_prompt"&gt;
 &lt;/div&gt;
 &lt;div class="inner_cell"&gt;
 &lt;div class="text_cell_render border-box-sizing rendered_html"&gt;
@@ -21186,7 +22559,11 @@ L48.8811 11.6278" style="fill:none;stroke:#262626;stroke-linecap:square;stroke-l
 &lt;div class="output"&gt;
 
 
-&lt;div class="output_area"&gt;&lt;div class="prompt"&gt;&lt;/div&gt;
+&lt;div class="output_area"&gt;
+
+&lt;div class="prompt"&gt;&lt;/div&gt;
+
+
 &lt;div class="output_subarea output_stream output_stdout output_text"&gt;
 &lt;pre class="ipynb"&gt;sin(30.0 deg) = 0.5000
 sin(0.52360 rad) = 0.5000
@@ -21199,8 +22576,7 @@ sin(108000 arcsec) = 0.5000
 &lt;/div&gt;
 
 &lt;/div&gt;
-&lt;div class="cell border-box-sizing text_cell rendered"&gt;
-&lt;div class="prompt input_prompt"&gt;
+&lt;div class="cell border-box-sizing text_cell rendered"&gt;&lt;div class="prompt input_prompt"&gt;
 &lt;/div&gt;
 &lt;div class="inner_cell"&gt;
 &lt;div class="text_cell_render border-box-sizing rendered_html"&gt;
@@ -21248,7 +22624,11 @@ sin(108000 arcsec) = 0.5000
 &lt;div class="output"&gt;
 
 
-&lt;div class="output_area"&gt;&lt;div class="prompt"&gt;&lt;/div&gt;
+&lt;div class="output_area"&gt;
+
+&lt;div class="prompt"&gt;&lt;/div&gt;
+
+
 &lt;div class="output_subarea output_stream output_stdout output_text"&gt;
 &lt;pre class="ipynb"&gt;Gravitational force on a body of mass 1 lb at 1 Earth orbit from the Sun: 0.00269058876529 N
 Units of the gravitational constants in astropy: m3 / (kg s2)
@@ -21260,8 +22640,7 @@ Units of the gravitational constants in astropy: m3 / (kg s2)
 &lt;/div&gt;
 
 &lt;/div&gt;
-&lt;div class="cell border-box-sizing text_cell rendered"&gt;
-&lt;div class="prompt input_prompt"&gt;
+&lt;div class="cell border-box-sizing text_cell rendered"&gt;&lt;div class="prompt input_prompt"&gt;
 &lt;/div&gt;
 &lt;div class="inner_cell"&gt;
 &lt;div class="text_cell_render border-box-sizing rendered_html"&gt;
@@ -21291,7 +22670,11 @@ Units of the gravitational constants in astropy: m3 / (kg s2)
 &lt;div class="output"&gt;
 
 
-&lt;div class="output_area"&gt;&lt;div class="prompt"&gt;&lt;/div&gt;
+&lt;div class="output_area"&gt;
+
+&lt;div class="prompt"&gt;&lt;/div&gt;
+
+
 &lt;div class="output_subarea output_stream output_stdout output_text"&gt;
 &lt;pre class="ipynb"&gt;&amp;#39;m4 solMass / (kg3 s2)&amp;#39; and &amp;#39;N&amp;#39; (force) are not convertible
 &lt;/pre&gt;
@@ -21302,8 +22685,7 @@ Units of the gravitational constants in astropy: m3 / (kg s2)
 &lt;/div&gt;
 
 &lt;/div&gt;
-&lt;div class="cell border-box-sizing text_cell rendered"&gt;
-&lt;div class="prompt input_prompt"&gt;
+&lt;div class="cell border-box-sizing text_cell rendered"&gt;&lt;div class="prompt input_prompt"&gt;
 &lt;/div&gt;
 &lt;div class="inner_cell"&gt;
 &lt;div class="text_cell_render border-box-sizing rendered_html"&gt;
@@ -21312,9 +22694,26 @@ Units of the gravitational constants in astropy: m3 / (kg s2)
 
 &lt;/div&gt;
 &lt;/div&gt;
-&lt;/div&gt;&lt;/p&gt;</summary><category term="python"></category><category term="data analysis"></category></entry><entry><title>How Much Do My Measurements Disagree?</title><link href="http://joergdietrich.github.io/quantitative-data-disagreement.html" rel="alternate"></link><updated>2014-03-04T00:00:00+01:00</updated><author><name>Jörg Dietrich</name></author><id>tag:joergdietrich.github.io,2014-03-04:quantitative-data-disagreement.html</id><summary type="html">&lt;p&gt;
-&lt;div class="cell border-box-sizing text_cell rendered"&gt;
-&lt;div class="prompt input_prompt"&gt;
+&lt;/div&gt;
+ 
+
+&lt;/p&gt;</content><category term="python"></category><category term="data analysis"></category></entry><entry><title>How Much Do My Measurements Disagree?</title><link href="http://joergdietrich.github.io/quantitative-data-disagreement.html" rel="alternate"></link><published>2014-03-04T00:00:00+01:00</published><updated>2014-03-04T00:00:00+01:00</updated><author><name>Jörg Dietrich</name></author><id>tag:joergdietrich.github.io,2014-03-04:/quantitative-data-disagreement.html</id><summary type="html">&lt;p&gt;
+
+
+
+
+&lt;h2 id="-Or-why-&amp;quot;The-error-bars-overlap&amp;quot;-is-a-meaningless-statement."&gt; Or why &amp;#8220;The error bars overlap&amp;#8221; is a meaningless statement.&lt;a class="anchor-link" href="#-Or-why-&amp;quot;The-error-bars-overlap&amp;quot;-is-a-meaningless-statement."&gt;&amp;#182;&lt;/a&gt;&lt;/h2&gt;
+
+
+
+
+
+
+
+&lt;p&gt;In my work as an astrophysicist I have encountered quite a bit of confusion on how to quantify the level of disagreement between two or more measurements with error bars, or even more complex multi-dimensional confidence volumes. This is even more true this term when I am teaching an undergraduate lab course. Thinking a little about this myself, I realized that this is not something I have ever seen written up. At least not in any concise form. So I decided to create this little document, not only to educate others, but also to organize my own thoughts. I put an emphasis on developing the concepts and I make no attempt at&amp;nbsp;rigour.&lt;/p&gt;
+&lt;p&gt;Suppose we have three measurements of the gravitational acceleration on the Earth&amp;#8217;s surface, all with their own error bars (or measurement uncertainties, if you prefer). These are shown in the plot below and the error bars indicate their $1\sigma$ standard deviation.
+</summary><content type="html">&lt;p&gt;
+&lt;div class="cell border-box-sizing text_cell rendered"&gt;&lt;div class="prompt input_prompt"&gt;
 &lt;/div&gt;
 &lt;div class="inner_cell"&gt;
 &lt;div class="text_cell_render border-box-sizing rendered_html"&gt;
@@ -21322,8 +22721,7 @@ Units of the gravitational constants in astropy: m3 / (kg s2)
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;/div&gt;
-&lt;div class="cell border-box-sizing text_cell rendered"&gt;
-&lt;div class="prompt input_prompt"&gt;
+&lt;div class="cell border-box-sizing text_cell rendered"&gt;&lt;div class="prompt input_prompt"&gt;
 &lt;/div&gt;
 &lt;div class="inner_cell"&gt;
 &lt;div class="text_cell_render border-box-sizing rendered_html"&gt;
@@ -21351,7 +22749,7 @@ Units of the gravitational constants in astropy: m3 / (kg s2)
 &lt;span class="n"&gt;plt&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;xticks&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;np&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;arange&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mi"&gt;4&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
 &lt;span class="n"&gt;plt&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;axis&lt;/span&gt;&lt;span class="p"&gt;([&lt;/span&gt;&lt;span class="mf"&gt;0.5&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mf"&gt;3.5&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mf"&gt;9.65&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mi"&gt;10&lt;/span&gt;&lt;span class="p"&gt;])&lt;/span&gt;
 &lt;span class="n"&gt;plt&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;xlabel&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;Measurement&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;fontsize&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="mi"&gt;14&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
-&lt;span class="n"&gt;plt&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;ylabel&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;r&amp;quot;Gravity of Earth/(m s$^{-2}$)&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;fontsize&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="mi"&gt;14&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="n"&gt;plt&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;ylabel&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="sa"&gt;r&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;Gravity of Earth/(m s$^{-2}$)&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;fontsize&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="mi"&gt;14&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
 &lt;span class="n"&gt;plt&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;draw&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 
@@ -21364,7 +22762,11 @@ Units of the gravitational constants in astropy: m3 / (kg s2)
 &lt;div class="output"&gt;
 
 
-&lt;div class="output_area"&gt;&lt;div class="prompt"&gt;&lt;/div&gt;
+&lt;div class="output_area"&gt;
+
+&lt;div class="prompt"&gt;&lt;/div&gt;
+
+
 
 &lt;div class="output_svg output_subarea "&gt;
 &lt;?xml version="1.0" encoding="utf-8" standalone="no"?&gt;
@@ -22453,8 +23855,7 @@ L72.1129 15.2203" style="fill:none;stroke:#262626;stroke-width:0.5;"/&gt;
 &lt;/div&gt;
 
 &lt;/div&gt;
-&lt;div class="cell border-box-sizing text_cell rendered"&gt;
-&lt;div class="prompt input_prompt"&gt;
+&lt;div class="cell border-box-sizing text_cell rendered"&gt;&lt;div class="prompt input_prompt"&gt;
 &lt;/div&gt;
 &lt;div class="inner_cell"&gt;
 &lt;div class="text_cell_render border-box-sizing rendered_html"&gt;
@@ -22490,8 +23891,8 @@ $$
 &lt;span class="n"&gt;plt&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;axis&lt;/span&gt;&lt;span class="p"&gt;([&lt;/span&gt;&lt;span class="mf"&gt;0.5&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mf"&gt;3.5&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mf"&gt;9.65&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mi"&gt;10&lt;/span&gt;&lt;span class="p"&gt;])&lt;/span&gt;
 &lt;span class="n"&gt;plt&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;xticks&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;np&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;arange&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;3&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;$1-2$&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;$1-3$&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;$2-3$&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;])&lt;/span&gt;
 &lt;span class="n"&gt;plt&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;axis&lt;/span&gt;&lt;span class="p"&gt;([&lt;/span&gt;&lt;span class="mf"&gt;0.5&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mf"&gt;3.5&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="mf"&gt;0.25&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mf"&gt;0.05&lt;/span&gt;&lt;span class="p"&gt;])&lt;/span&gt;
-&lt;span class="n"&gt;plt&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;xlabel&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;r&amp;quot;Difference&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;fontsize&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="mi"&gt;14&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
-&lt;span class="n"&gt;plt&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;ylabel&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;r&amp;quot;$\Delta_&lt;/span&gt;&lt;span class="si"&gt;{ij}&lt;/span&gt;&lt;span class="s2"&gt;$/(m s$^{-2}$)&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;fontsize&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="mi"&gt;14&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="n"&gt;plt&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;xlabel&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="sa"&gt;r&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;Difference&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;fontsize&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="mi"&gt;14&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="n"&gt;plt&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;ylabel&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="sa"&gt;r&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;$\Delta_&lt;/span&gt;&lt;span class="si"&gt;{ij}&lt;/span&gt;&lt;span class="s2"&gt;$/(m s$^{-2}$)&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;fontsize&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="mi"&gt;14&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
 &lt;span class="n"&gt;plt&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;draw&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 
@@ -22504,7 +23905,11 @@ $$
 &lt;div class="output"&gt;
 
 
-&lt;div class="output_area"&gt;&lt;div class="prompt"&gt;&lt;/div&gt;
+&lt;div class="output_area"&gt;
+
+&lt;div class="prompt"&gt;&lt;/div&gt;
+
+
 
 &lt;div class="output_svg output_subarea "&gt;
 &lt;?xml version="1.0" encoding="utf-8" standalone="no"?&gt;
@@ -23331,8 +24736,7 @@ L78.3407 15.2203" style="fill:none;stroke:#262626;stroke-width:0.5;"/&gt;
 &lt;/div&gt;
 
 &lt;/div&gt;
-&lt;div class="cell border-box-sizing text_cell rendered"&gt;
-&lt;div class="prompt input_prompt"&gt;
+&lt;div class="cell border-box-sizing text_cell rendered"&gt;&lt;div class="prompt input_prompt"&gt;
 &lt;/div&gt;
 &lt;div class="inner_cell"&gt;
 &lt;div class="text_cell_render border-box-sizing rendered_html"&gt;
@@ -23356,7 +24760,7 @@ L78.3407 15.2203" style="fill:none;stroke:#262626;stroke-width:0.5;"/&gt;
 &lt;span class="n"&gt;plt&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;xticks&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;np&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;arange&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mi"&gt;5&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
 &lt;span class="n"&gt;plt&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;axis&lt;/span&gt;&lt;span class="p"&gt;([&lt;/span&gt;&lt;span class="mf"&gt;0.5&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mf"&gt;4.5&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mf"&gt;9.65&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mi"&gt;10&lt;/span&gt;&lt;span class="p"&gt;])&lt;/span&gt;
 &lt;span class="n"&gt;plt&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;xlabel&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;Measurement&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;fontsize&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="mi"&gt;14&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
-&lt;span class="n"&gt;plt&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;ylabel&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;r&amp;quot;Gravity of Earth/(m s$^{-2}$)&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;fontsize&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="mi"&gt;14&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="n"&gt;plt&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;ylabel&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="sa"&gt;r&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;Gravity of Earth/(m s$^{-2}$)&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;fontsize&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="mi"&gt;14&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
 &lt;span class="n"&gt;plt&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;draw&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 
@@ -23369,7 +24773,11 @@ L78.3407 15.2203" style="fill:none;stroke:#262626;stroke-width:0.5;"/&gt;
 &lt;div class="output"&gt;
 
 
-&lt;div class="output_area"&gt;&lt;div class="prompt"&gt;&lt;/div&gt;
+&lt;div class="output_area"&gt;
+
+&lt;div class="prompt"&gt;&lt;/div&gt;
+
+
 
 &lt;div class="output_svg output_subarea "&gt;
 &lt;?xml version="1.0" encoding="utf-8" standalone="no"?&gt;
@@ -24543,8 +25951,7 @@ L72.1129 15.2203" style="fill:none;stroke:#262626;stroke-width:0.5;"/&gt;
 &lt;/div&gt;
 
 &lt;/div&gt;
-&lt;div class="cell border-box-sizing text_cell rendered"&gt;
-&lt;div class="prompt input_prompt"&gt;
+&lt;div class="cell border-box-sizing text_cell rendered"&gt;&lt;div class="prompt input_prompt"&gt;
 &lt;/div&gt;
 &lt;div class="inner_cell"&gt;
 &lt;div class="text_cell_render border-box-sizing rendered_html"&gt;
@@ -24569,8 +25976,8 @@ L72.1129 15.2203" style="fill:none;stroke:#262626;stroke-width:0.5;"/&gt;
 &lt;span class="n"&gt;plt&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;axis&lt;/span&gt;&lt;span class="p"&gt;([&lt;/span&gt;&lt;span class="mf"&gt;0.5&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mf"&gt;4.5&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mf"&gt;9.65&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mi"&gt;10&lt;/span&gt;&lt;span class="p"&gt;])&lt;/span&gt;
 &lt;span class="n"&gt;plt&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;xticks&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;np&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;arange&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;4&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;$1-2$&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;$1-3$&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;$2-3$&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;$1-4$&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;])&lt;/span&gt;
 &lt;span class="n"&gt;plt&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;axis&lt;/span&gt;&lt;span class="p"&gt;([&lt;/span&gt;&lt;span class="mf"&gt;0.5&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mf"&gt;4.5&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="mf"&gt;0.25&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mf"&gt;0.05&lt;/span&gt;&lt;span class="p"&gt;])&lt;/span&gt;
-&lt;span class="n"&gt;plt&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;xlabel&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;r&amp;quot;Difference&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;fontsize&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="mi"&gt;14&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
-&lt;span class="n"&gt;plt&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;ylabel&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;r&amp;quot;$\Delta_&lt;/span&gt;&lt;span class="si"&gt;{ij}&lt;/span&gt;&lt;span class="s2"&gt;$/(m s$^{-2}$)&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;fontsize&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="mi"&gt;14&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="n"&gt;plt&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;xlabel&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="sa"&gt;r&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;Difference&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;fontsize&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="mi"&gt;14&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="n"&gt;plt&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;ylabel&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="sa"&gt;r&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;$\Delta_&lt;/span&gt;&lt;span class="si"&gt;{ij}&lt;/span&gt;&lt;span class="s2"&gt;$/(m s$^{-2}$)&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;fontsize&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="mi"&gt;14&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
 &lt;span class="n"&gt;plt&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;draw&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 
@@ -24583,7 +25990,11 @@ L72.1129 15.2203" style="fill:none;stroke:#262626;stroke-width:0.5;"/&gt;
 &lt;div class="output"&gt;
 
 
-&lt;div class="output_area"&gt;&lt;div class="prompt"&gt;&lt;/div&gt;
+&lt;div class="output_area"&gt;
+
+&lt;div class="prompt"&gt;&lt;/div&gt;
+
+
 
 &lt;div class="output_svg output_subarea "&gt;
 &lt;?xml version="1.0" encoding="utf-8" standalone="no"?&gt;
@@ -25488,8 +26899,7 @@ L78.3407 15.2203" style="fill:none;stroke:#262626;stroke-width:0.5;"/&gt;
 &lt;/div&gt;
 
 &lt;/div&gt;
-&lt;div class="cell border-box-sizing text_cell rendered"&gt;
-&lt;div class="prompt input_prompt"&gt;
+&lt;div class="cell border-box-sizing text_cell rendered"&gt;&lt;div class="prompt input_prompt"&gt;
 &lt;/div&gt;
 &lt;div class="inner_cell"&gt;
 &lt;div class="text_cell_render border-box-sizing rendered_html"&gt;
@@ -25497,9 +26907,18 @@ L78.3407 15.2203" style="fill:none;stroke:#262626;stroke-width:0.5;"/&gt;
 
 &lt;/div&gt;
 &lt;/div&gt;
-&lt;/div&gt;&lt;/p&gt;</summary><category term="statistics"></category><category term="data analysis"></category></entry><entry><title>Blogging with IPython and Collapsible Input Cells</title><link href="http://joergdietrich.github.io/notebook-collapse-input.html" rel="alternate"></link><updated>2014-02-08T00:00:00+01:00</updated><author><name>Jörg Dietrich</name></author><id>tag:joergdietrich.github.io,2014-02-08:notebook-collapse-input.html</id><summary type="html">&lt;p&gt;
-&lt;div class="cell border-box-sizing text_cell rendered"&gt;
-&lt;div class="prompt input_prompt"&gt;
+&lt;/div&gt;
+ 
+
+&lt;/p&gt;</content><category term="statistics"></category><category term="data analysis"></category></entry><entry><title>Blogging with IPython and Collapsible Input Cells</title><link href="http://joergdietrich.github.io/notebook-collapse-input.html" rel="alternate"></link><published>2014-02-08T00:00:00+01:00</published><updated>2014-02-08T00:00:00+01:00</updated><author><name>Jörg Dietrich</name></author><id>tag:joergdietrich.github.io,2014-02-08:/notebook-collapse-input.html</id><summary type="html">&lt;p&gt;
+
+
+
+
+&lt;p&gt;I learned about IPython Notebooks from the fantastic blog of &lt;a href="http://jakevdp.github.io/"&gt;jakevdp&lt;/a&gt;. Realizing what a great way they are to interactivly manipulate Python code and transform the results into web pages, I started playing around with them and the pelican site generator myself. I had a few science questions on my mind for which I thought writing things up with some nice graphical illustrations would clarify things for myself and maybe others. Then I arrived at a point where I had long input boxes in my web pages with Python code that was not very interesting. I just wanted to have some figures for illustration. Of course I could just generate some plots, save them and load them into the Notebook to display them. But that seemed like an unnecessary detour if I already created the plots in the notebook. Could I not just hide the input cells? It turns out the answer was apparently&amp;nbsp;&amp;#8220;no&amp;#8221;.&lt;/p&gt;
+&lt;p&gt;So I interrupted the process of writing about the original problems that were on my mind and set out to modify the liquid_tags pelican plugin that generates these pages so that the input code cells can be hidden.
+</summary><content type="html">&lt;p&gt;
+&lt;div class="cell border-box-sizing text_cell rendered"&gt;&lt;div class="prompt input_prompt"&gt;
 &lt;/div&gt;
 &lt;div class="inner_cell"&gt;
 &lt;div class="text_cell_render border-box-sizing rendered_html"&gt;
@@ -25510,8 +26929,7 @@ L78.3407 15.2203" style="fill:none;stroke:#262626;stroke-width:0.5;"/&gt;
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;/div&gt;
-&lt;div class="cell border-box-sizing text_cell rendered"&gt;
-&lt;div class="prompt input_prompt"&gt;
+&lt;div class="cell border-box-sizing text_cell rendered"&gt;&lt;div class="prompt input_prompt"&gt;
 &lt;/div&gt;
 &lt;div class="inner_cell"&gt;
 &lt;div class="text_cell_render border-box-sizing rendered_html"&gt;
@@ -25589,7 +27007,11 @@ L78.3407 15.2203" style="fill:none;stroke:#262626;stroke-width:0.5;"/&gt;
 &lt;div class="output"&gt;
 
 
-&lt;div class="output_area"&gt;&lt;div class="prompt"&gt;&lt;/div&gt;
+&lt;div class="output_area"&gt;
+
+&lt;div class="prompt"&gt;&lt;/div&gt;
+
+
 
 
 &lt;div class="output_png output_subarea "&gt;
@@ -25895,8 +27317,7 @@ QmCC
 &lt;/div&gt;
 
 &lt;/div&gt;
-&lt;div class="cell border-box-sizing text_cell rendered"&gt;
-&lt;div class="prompt input_prompt"&gt;
+&lt;div class="cell border-box-sizing text_cell rendered"&gt;&lt;div class="prompt input_prompt"&gt;
 &lt;/div&gt;
 &lt;div class="inner_cell"&gt;
 &lt;div class="text_cell_render border-box-sizing rendered_html"&gt;
@@ -25927,7 +27348,11 @@ QmCC
 &lt;div class="output"&gt;
 
 
-&lt;div class="output_area"&gt;&lt;div class="prompt"&gt;&lt;/div&gt;
+&lt;div class="output_area"&gt;
+
+&lt;div class="prompt"&gt;&lt;/div&gt;
+
+
 
 
 &lt;div class="output_png output_subarea "&gt;
@@ -26442,8 +27867,7 @@ RK5CYII=
 &lt;/div&gt;
 
 &lt;/div&gt;
-&lt;div class="cell border-box-sizing text_cell rendered"&gt;
-&lt;div class="prompt input_prompt"&gt;
+&lt;div class="cell border-box-sizing text_cell rendered"&gt;&lt;div class="prompt input_prompt"&gt;
 &lt;/div&gt;
 &lt;div class="inner_cell"&gt;
 &lt;div class="text_cell_render border-box-sizing rendered_html"&gt;
@@ -26451,8 +27875,7 @@ RK5CYII=
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;/div&gt;
-&lt;div class="cell border-box-sizing text_cell rendered"&gt;
-&lt;div class="prompt input_prompt"&gt;
+&lt;div class="cell border-box-sizing text_cell rendered"&gt;&lt;div class="prompt input_prompt"&gt;
 &lt;/div&gt;
 &lt;div class="inner_cell"&gt;
 &lt;div class="text_cell_render border-box-sizing rendered_html"&gt;
@@ -26460,4 +27883,7 @@ RK5CYII=
 
 &lt;/div&gt;
 &lt;/div&gt;
-&lt;/div&gt;&lt;/p&gt;</summary><category term="python"></category><category term="pelican"></category><category term="blogging"></category><category term="notebook"></category></entry></feed>
+&lt;/div&gt;
+ 
+
+&lt;/p&gt;</content><category term="python"></category><category term="pelican"></category><category term="blogging"></category><category term="notebook"></category></entry></feed>
